@@ -1,4 +1,17 @@
-import { ShieldCheck, Clock, XCircle } from "lucide-react";
+import { useState } from "react";
+import { ShieldCheck, Clock, XCircle, PartyPopper } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
 
@@ -32,9 +45,34 @@ const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: 
   },
 };
 
+const guiltyPleasures = [
+  "You rebel. Enjoy it! 🎉",
+  "YOLO activated. No regrets (maybe). 💸",
+  "Future you might side-eye this… but present you is thrilled.",
+  "The heart wants what the heart wants. 💛",
+];
+
 export function VerdictDisplay({ verdict, reason, tip }: VerdictDisplayProps) {
+  const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
+
+  if (overridden) {
+    return (
+      <div className="animate-verdict-enter rounded-2xl bg-verdict-buy/10 ring-1 ring-verdict-buy/20 p-8 text-center space-y-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-verdict-buy/10 text-verdict-buy">
+          <PartyPopper className="w-8 h-8" strokeWidth={2} />
+        </div>
+        <div>
+          <h2 className="text-4xl font-bold tracking-tight font-mono text-verdict-buy">BUY</h2>
+          <p className="text-muted-foreground mt-1 text-sm">You overrode the verdict</p>
+        </div>
+        <p className="text-sm text-foreground/80 leading-relaxed max-w-md mx-auto">
+          {guiltyPleasures[Math.floor(Math.random() * guiltyPleasures.length)]}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={`animate-verdict-enter rounded-2xl ${c.bg} ring-1 ${c.ring} p-8 text-center space-y-4`}>
@@ -59,6 +97,35 @@ export function VerdictDisplay({ verdict, reason, tip }: VerdictDisplayProps) {
           <p className="text-sm text-foreground/80 leading-relaxed">{tip}</p>
         </div>
       </div>
+
+      {verdict !== "BUY" && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className="mt-2 text-xs text-muted-foreground hover:text-foreground active:scale-[0.97] transition-transform"
+            >
+              Get it anyway →
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {verdict === "SKIP"
+                  ? "The numbers say this is a bad idea. Override at your own risk!"
+                  : "We suggested waiting — but it's your money."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="rounded-xl">Nah, I'll pass</AlertDialogCancel>
+              <AlertDialogAction className="rounded-xl" onClick={() => setOverridden(true)}>
+                Buy it anyway
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }
