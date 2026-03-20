@@ -47,6 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        verdict: {
+          buy: "hsl(var(--verdict-buy))",
+          wait: "hsl(var(--verdict-wait))",
+          skip: "hsl(var(--verdict-skip))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
