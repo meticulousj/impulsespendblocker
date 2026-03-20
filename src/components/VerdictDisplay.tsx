@@ -19,6 +19,7 @@ interface VerdictDisplayProps {
   verdict: Verdict;
   reason: string;
   tip: string;
+  onOverride?: () => void;
 }
 
 const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: string; bg: string; ring: string }> = {
@@ -52,10 +53,15 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, onOverride }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
+
+  const handleOverride = () => {
+    setOverridden(true);
+    onOverride?.();
+  };
 
   if (overridden) {
     return (
@@ -119,7 +125,7 @@ export function VerdictDisplay({ verdict, reason, tip }: VerdictDisplayProps) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className="rounded-xl">Nah, I'll pass</AlertDialogCancel>
-              <AlertDialogAction className="rounded-xl" onClick={() => setOverridden(true)}>
+              <AlertDialogAction className="rounded-xl" onClick={handleOverride}>
                 Buy it anyway
               </AlertDialogAction>
             </AlertDialogFooter>

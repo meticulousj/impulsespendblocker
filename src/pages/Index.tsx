@@ -1,8 +1,12 @@
 import { useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { SpendForm } from "@/components/SpendForm";
 import { VerdictDisplay } from "@/components/VerdictDisplay";
+import { AuthForm } from "@/components/AuthForm";
 import { analyzeSpend } from "@/lib/spendAnalyzer";
-import { ShieldAlert } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useSaveDecision } from "@/hooks/usePurchaseHistory";
+import { ShieldAlert, History, LogOut } from "lucide-react";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
 
@@ -12,26 +16,69 @@ interface Result {
   tip: string;
 }
 
+interface FormData {
+  item: string;
+  price: number;
+  income: number;
+  savings: number;
+  goal: string;
+}
+
 export default function Index() {
+  const { user, signOut, loading: authLoading } = useAuth();
   const [result, setResult] = useState<Result | null>(null);
+  const [formData, setFormData] = useState<FormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const saveDecision = useSaveDecision();
 
   const handleSubmit = useCallback(
-    (data: { item: string; price: number; income: number; savings: number; goal: string }) => {
+    (data: FormData) => {
       setIsLoading(true);
       setResult(null);
-      // Simulate brief thinking delay for UX
+      setFormData(data);
       setTimeout(() => {
         const analysis = analyzeSpend(data);
         setResult(analysis);
         setIsLoading(false);
+
+        // Auto-save if logged in
+        if (user) {
+          saveDecision.mutate({
+            item: data.item,
+            price: data.price,
+            income: data.income,
+            savings: data.savings,
+            goal: data.goal,
+            verdict: analysis.verdict,
+            overridden: false,
+            reason: analysis.reason,
+            tip: analysis.tip,
+          });
+        }
       }, 600);
     },
-    []
+    [user, saveDecision]
   );
+
+  const handleOverride = useCallback(() => {
+    if (user && formData && result) {
+      saveDecision.mutate({
+        item: formData.item,
+        price: formData.price,
+        income: formData.income,
+        savings: formData.savings,
+        goal: formData.goal,
+        verdict: result.verdict,
+        overridden: true,
+        reason: result.reason,
+        tip: result.tip,
+      });
+    }
+  }, [user, formData, result, saveDecision]);
 
   const handleReset = () => {
     setResult(null);
+    setFormData(null);
   };
 
   return (
@@ -50,14 +97,53 @@ export default function Index() {
           </p>
         </div>
 
+        {/* Auth bar */}
+        {!authLoading && (
+          <div className="flex items-center justify-center gap-3">
+            {user ? (
+              <>
+                <Link
+                  to="/history"
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <History className="w-3.5 h-3.5" />
+                  History
+                </Link>
+                <span className="text-border">·</span>
+                <span className="text-xs text-muted-foreground truncate max-w-[160px]">
+                  {user.email}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Sign in below to save your history
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Form or Result */}
         {!result ? (
-          <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
-            <SpendForm onSubmit={handleSubmit} isLoading={isLoading} />
+          <div className="space-y-4">
+            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+              <SpendForm onSubmit={handleSubmit} isLoading={isLoading} />
+            </div>
+            {!user && !authLoading && <AuthForm />}
           </div>
         ) : (
           <div className="space-y-4">
-            <VerdictDisplay verdict={result.verdict} reason={result.reason} tip={result.tip} />
+            <VerdictDisplay
+              verdict={result.verdict}
+              reason={result.reason}
+              tip={result.tip}
+              onOverride={handleOverride}
+            />
             <button
               onClick={handleReset}
               className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2 active:scale-[0.98]"
@@ -69,7 +155,9 @@ export default function Index() {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/60">
-          Your data stays on your device. Nothing is stored or sent anywhere.
+          {user
+            ? "Your decisions are saved securely to your account."
+            : "Your data stays on your device. Nothing is stored or sent anywhere."}
         </p>
       </div>
     </div>
