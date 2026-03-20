@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      purchase_decisions: {
+        Row: {
+          created_at: string
+          goal: string
+          id: string
+          income: number
+          item: string
+          overridden: boolean
+          price: number
+          reason: string
+          savings: number
+          tip: string
+          user_id: string
+          verdict: string
+        }
+        Insert: {
+          created_at?: string
+          goal?: string
+          id?: string
+          income: number
+          item: string
+          overridden?: boolean
+          price: number
+          reason: string
+          savings?: number
+          tip: string
+          user_id: string
+          verdict: string
+        }
+        Update: {
+          created_at?: string
+          goal?: string
+          id?: string
+          income?: number
+          item?: string
+          overridden?: boolean
+          price?: number
+          reason?: string
+          savings?: number
+          tip?: string
+          user_id?: string
+          verdict?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
