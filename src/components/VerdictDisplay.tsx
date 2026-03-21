@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldCheck, Clock, XCircle, PartyPopper } from "lucide-react";
+import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -19,6 +19,7 @@ interface VerdictDisplayProps {
   verdict: Verdict;
   reason: string;
   tip: string;
+  isAI?: boolean;
   onOverride?: () => void;
 }
 
@@ -53,7 +54,7 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip, onOverride }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
@@ -91,6 +92,12 @@ export function VerdictDisplay({ verdict, reason, tip, onOverride }: VerdictDisp
           {verdict}
         </h2>
         <p className="text-muted-foreground mt-1 text-sm">{c.label}</p>
+        {isAI && (
+          <span className="inline-flex items-center gap-1 mt-2 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+            <Sparkles className="w-2.5 h-2.5" />
+            AI Analysis
+          </span>
+        )}
       </div>
 
       <div className="space-y-3 text-left max-w-md mx-auto">
