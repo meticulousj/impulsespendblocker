@@ -8,7 +8,7 @@ import { analyzeSpend } from "@/lib/spendAnalyzer";
 import { useAuth } from "@/hooks/useAuth";
 import { useSaveDecision } from "@/hooks/usePurchaseHistory";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldAlert, History, LogOut, Sparkles } from "lucide-react";
+import { ShieldAlert, History, LogOut, Sparkles, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
@@ -143,6 +143,16 @@ export default function Index() {
     }
   };
 
+  const handleManageSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error || data?.error) throw new Error(data?.error || "Portal failed");
+      if (data?.url) window.open(data.url, "_blank");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not open subscription portal");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
@@ -176,6 +186,15 @@ export default function Index() {
                   {user.email}
                 </span>
                 {isPro && <ProBadge />}
+                {isPro && (
+                  <button
+                    onClick={handleManageSubscription}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    title="Manage subscription"
+                  >
+                    <Settings className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   onClick={signOut}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
