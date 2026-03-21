@@ -186,6 +186,15 @@ export default function Index() {
                   {user.email}
                 </span>
                 {isPro && <ProBadge />}
+                {isPro && (
+                  <button
+                    onClick={handleManageSubscription}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    title="Manage subscription"
+                  >
+                    <Settings className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   onClick={signOut}
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors"
