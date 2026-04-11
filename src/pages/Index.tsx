@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSaveDecision } from "@/hooks/usePurchaseHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { ShieldAlert, History, LogOut, Sparkles, Settings } from "lucide-react";
+import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
 import { toast } from "sonner";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
