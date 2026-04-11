@@ -281,6 +281,13 @@ export default function Index() {
               isAI={result.isAI}
               onOverride={handleOverride}
             />
+            {(result.verdict === "WAIT" || result.verdict === "SKIP") && formData && (
+              <WaitPeriodSuggestion
+                price={formData.price}
+                income={formData.income}
+                verdict={result.verdict}
+              />
+            )}
             <button
               onClick={handleReset}
               className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2 active:scale-[0.98]"
