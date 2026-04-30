@@ -308,6 +308,7 @@ export default function Index() {
                 price={formData.price}
                 income={formData.income}
                 verdict={result.verdict}
+                archetype={archetype}
               />
             )}
             <button
@@ -326,6 +327,7 @@ export default function Index() {
             : "Your data stays on your device. Nothing is stored or sent anywhere."}
         </p>
       </div>
+      <PersonalityQuiz open={quizOpen} onClose={() => setQuizOpen(false)} />
     </div>
   );
 }
