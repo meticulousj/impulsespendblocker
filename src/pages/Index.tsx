@@ -7,6 +7,9 @@ import { ProBadge } from "@/components/ProBadge";
 import { analyzeSpend } from "@/lib/spendAnalyzer";
 import { useAuth } from "@/hooks/useAuth";
 import { useSaveDecision } from "@/hooks/usePurchaseHistory";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { PersonalityQuiz } from "@/components/PersonalityQuiz";
+import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { supabase } from "@/integrations/supabase/client";
 import { ShieldAlert, History, LogOut, Sparkles, Settings } from "lucide-react";
 import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
@@ -37,6 +40,16 @@ export default function Index() {
   const [useAI, setUseAI] = useState(false);
   const saveDecision = useSaveDecision();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { data: profile, isLoading: profileLoading } = useUserProfile();
+  const archetype = profile?.archetype ?? null;
+  const [quizOpen, setQuizOpen] = useState(false);
+
+  // Auto-open quiz for logged-in users who haven't taken it
+  useEffect(() => {
+    if (user && !profileLoading && !profile) {
+      setQuizOpen(true);
+    }
+  }, [user, profileLoading, profile]);
 
   // Handle checkout success
   useEffect(() => {
@@ -68,19 +81,19 @@ export default function Index() {
         if (useAI && isPro) {
           // Call AI verdict edge function
           const { data: aiResult, error } = await supabase.functions.invoke("ai-verdict", {
-            body: data,
+            body: { ...data, archetype },
           });
           if (error || aiResult?.error) {
             toast.error(aiResult?.error || "AI analysis failed. Falling back to rule engine.");
             // Fallback to rule engine
-            analysis = { ...analyzeSpend(data), isAI: false };
+            analysis = { ...analyzeSpend(data, archetype), isAI: false };
           } else {
             analysis = { ...aiResult, isAI: true };
           }
         } else {
           // Simulate brief delay for rule engine
           await new Promise((r) => setTimeout(r, 600));
-          analysis = { ...analyzeSpend(data), isAI: false };
+          analysis = { ...analyzeSpend(data, archetype), isAI: false };
         }
 
         setResult(analysis);
@@ -106,7 +119,7 @@ export default function Index() {
         setIsLoading(false);
       }
     },
-    [useAI, isPro, user, saveDecision]
+    [useAI, isPro, user, saveDecision, archetype]
   );
 
   const handleOverride = useCallback(() => {
@@ -186,6 +199,15 @@ export default function Index() {
                 <span className="text-xs text-muted-foreground truncate max-w-[160px]">
                   {user.email}
                 </span>
+                {archetype && (
+                  <button
+                    onClick={() => setQuizOpen(true)}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    title="Retake spending personality quiz"
+                  >
+                    {ARCHETYPES[archetype].emoji} {ARCHETYPES[archetype].label}
+                  </button>
+                )}
                 {isPro && <ProBadge />}
                 {isPro && (
                   <button
@@ -286,6 +308,7 @@ export default function Index() {
                 price={formData.price}
                 income={formData.income}
                 verdict={result.verdict}
+                archetype={archetype}
               />
             )}
             <button
@@ -304,6 +327,7 @@ export default function Index() {
             : "Your data stays on your device. Nothing is stored or sent anywhere."}
         </p>
       </div>
+      <PersonalityQuiz open={quizOpen} onClose={() => setQuizOpen(false)} />
     </div>
   );
 }

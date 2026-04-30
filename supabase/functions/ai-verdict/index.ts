@@ -11,12 +11,24 @@ serve(async (req) => {
   }
 
   try {
-    const { item, price, income, savings, goal } = await req.json();
+    const { item, price, income, savings, goal, archetype } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const priceToIncomeRatio = ((price / income) * 100).toFixed(1);
     const savingsAfterPurchase = savings - price;
+
+    const archetypeTone: Record<string, string> = {
+      impulse:
+        "User is an IMPULSE BUYER. Be firm, protective, and direct. Push back harder on borderline purchases. Use phrases like 'pump the brakes' and 'sleep on it'. Be the friend who stops them from doing something they'll regret. Lean toward WAIT or SKIP when borderline.",
+      deal_hunter:
+        "User is a DEAL HUNTER. Frame advice around value, cost-per-use, and whether the price represents real savings. Acknowledge their bargain instincts but call out 'fake deals' (buying things they don't need just because discounted).",
+      saver:
+        "User is a SAVER. Be warm and validating. Remind them money is a tool, not a trophy. For affordable purchases, give explicit permission to enjoy. Only push back hard when something genuinely threatens their goals. Lean toward BUY when borderline.",
+    };
+    const toneBlock = archetype && archetypeTone[archetype]
+      ? `\n\nSPENDING PERSONALITY:\n${archetypeTone[archetype]}`
+      : "";
 
     const systemPrompt = `You are a blunt, no-BS personal finance advisor. The user is about to make a purchase and needs your honest take.
 
@@ -28,7 +40,7 @@ Verdict rules:
 - WAIT: price is 5-25% of income, user has goals that conflict, or timing is bad
 - BUY: affordable, won't derail goals, user can handle it
 
-Be specific. Reference their actual numbers. Be warm but honest. Don't sugarcoat.`;
+Be specific. Reference their actual numbers. Be warm but honest. Don't sugarcoat.${toneBlock}`;
 
     const userPrompt = `Item: "${item}"
 Price: $${price.toLocaleString()}

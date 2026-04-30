@@ -1,3 +1,5 @@
+import { ARCHETYPES, type Archetype } from "@/lib/archetypeConfig";
+
 type Verdict = "BUY" | "WAIT" | "SKIP";
 
 interface AnalysisInput {
@@ -14,14 +16,17 @@ interface AnalysisResult {
   tip: string;
 }
 
-export function analyzeSpend(input: AnalysisInput): AnalysisResult {
+export function analyzeSpend(input: AnalysisInput, archetype?: Archetype | null): AnalysisResult {
   const { item, price, income, savings, goal } = input;
   const priceToIncomeRatio = price / income;
   const savingsAfter = savings - price;
   const hasSavingsGoal = goal.length > 0;
 
-  // Rule engine
-  // SKIP conditions
+  // Per-archetype thresholds (fall back to balanced defaults)
+  const skipRatio = archetype ? ARCHETYPES[archetype].skipRatio : 0.25;
+  const waitRatio = archetype ? ARCHETYPES[archetype].waitRatio : 0.1;
+
+  // Hard SKIP: more than half of monthly income (universal)
   if (priceToIncomeRatio > 0.5) {
     return {
       verdict: "SKIP",
@@ -38,7 +43,7 @@ export function analyzeSpend(input: AnalysisInput): AnalysisResult {
     };
   }
 
-  if (priceToIncomeRatio > 0.25) {
+  if (priceToIncomeRatio > skipRatio) {
     return {
       verdict: "SKIP",
       reason: `"${item}" at $${price.toLocaleString()} is ${(priceToIncomeRatio * 100).toFixed(0)}% of your monthly income. That's a big chunk for an impulse buy.`,
@@ -48,8 +53,7 @@ export function analyzeSpend(input: AnalysisInput): AnalysisResult {
     };
   }
 
-  // WAIT conditions
-  if (priceToIncomeRatio > 0.1) {
+  if (priceToIncomeRatio > waitRatio) {
     return {
       verdict: "WAIT",
       reason: `"${item}" at $${price.toLocaleString()} is ${(priceToIncomeRatio * 100).toFixed(0)}% of your income. Not unreasonable, but worth sleeping on.`,
@@ -73,7 +77,6 @@ export function analyzeSpend(input: AnalysisInput): AnalysisResult {
     };
   }
 
-  // BUY conditions
   if (priceToIncomeRatio <= 0.03) {
     return {
       verdict: "BUY",

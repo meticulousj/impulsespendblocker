@@ -59,6 +59,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          archetype: string
+          created_at: string
+          quiz_completed_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archetype: string
+          created_at?: string
+          quiz_completed_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archetype?: string
+          created_at?: string
+          quiz_completed_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
