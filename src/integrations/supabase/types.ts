@@ -14,9 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      digest_dismissals: {
+        Row: {
+          digest_id: string
+          dismissed_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          digest_id: string
+          dismissed_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          digest_id?: string
+          dismissed_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digest_dismissals_digest_id_fkey"
+            columns: ["digest_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_digests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchase_decisions: {
         Row: {
+          category: string | null
           created_at: string
+          decision_dow: number | null
+          decision_hour: number | null
           goal: string
           id: string
           income: number
@@ -30,7 +62,10 @@ export type Database = {
           verdict: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
+          decision_dow?: number | null
+          decision_hour?: number | null
           goal?: string
           id?: string
           income: number
@@ -44,7 +79,10 @@ export type Database = {
           verdict: string
         }
         Update: {
+          category?: string | null
           created_at?: string
+          decision_dow?: number | null
+          decision_hour?: number | null
           goal?: string
           id?: string
           income?: number
@@ -80,6 +118,39 @@ export type Database = {
           quiz_completed_at?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_digests: {
+        Row: {
+          category_breakdown: Json
+          created_at: string
+          generated_at: string
+          id: string
+          insights: Json
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          category_breakdown?: Json
+          created_at?: string
+          generated_at?: string
+          id?: string
+          insights?: Json
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          category_breakdown?: Json
+          created_at?: string
+          generated_at?: string
+          id?: string
+          insights?: Json
+          user_id?: string
+          week_end?: string
+          week_start?: string
         }
         Relationships: []
       }
