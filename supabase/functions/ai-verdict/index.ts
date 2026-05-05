@@ -33,7 +33,9 @@ serve(async (req) => {
     const systemPrompt = `You are a blunt, no-BS personal finance advisor. The user is about to make a purchase and needs your honest take.
 
 You MUST respond with EXACTLY this JSON structure (no markdown, no code fences):
-{"verdict":"BUY|WAIT|SKIP","reason":"2-3 sentences explaining why","tip":"One actionable tip"}
+{"verdict":"BUY|WAIT|SKIP","reason":"2-3 sentences explaining why","tip":"One actionable tip","category":"Gadgets|Clothing|Food|Subscription|Travel|Home|Beauty|Entertainment|Other"}
+
+Pick the single best category for the item.
 
 Verdict rules:
 - SKIP: price > 25% of income, or would drain savings below 1 month expenses, or clearly irresponsible
