@@ -30,14 +30,13 @@ serve(async (req) => {
 
     for (const uid of userIds) {
       try {
-        const resp = await fetch(`${SUPABASE_URL}/functions/v1/generate-insights-internal`, {
+        const resp = await fetch(`${SUPABASE_URL}/functions/v1/generate-insights`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${SERVICE_ROLE}`,
-            "x-internal-user-id": uid,
           },
-          body: JSON.stringify({ userId: uid }),
+          body: JSON.stringify({ internal: true, userId: uid }),
         });
         if (resp.ok) processed++;
         else failed++;
