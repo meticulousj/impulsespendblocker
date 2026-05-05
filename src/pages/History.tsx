@@ -2,6 +2,12 @@ import { useMemo } from "react";
 import { usePurchaseHistory } from "@/hooks/usePurchaseHistory";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import { CategoryBreakdown } from "@/components/CategoryBreakdown";
+import { HourHeatmap } from "@/components/HourHeatmap";
+import { InsightCards } from "@/components/InsightCards";
+import { useLatestDigest, useRefreshInsights } from "@/hooks/useInsights";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   TrendingDown,
@@ -23,8 +29,30 @@ const verdictConfig = {
 } as const;
 
 export default function History() {
-  const { user } = useAuth();
+  const { user, isPro } = useAuth();
   const { data: decisions, isLoading } = usePurchaseHistory();
+  const { data: digest } = useLatestDigest();
+  const refresh = useRefreshInsights();
+
+  const handleUpgrade = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout");
+      if (error || data?.error) throw new Error(data?.error || "Checkout failed");
+      if (data?.url) window.open(data.url, "_blank");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Checkout failed");
+    }
+  };
+
+  const handleRefresh = () => {
+    refresh.mutate(undefined, {
+      onSuccess: (res: any) => {
+        if (res?.skipped) toast("Not enough recent activity yet.");
+        else toast.success("Insights refreshed");
+      },
+      onError: (err: any) => toast.error(err?.message || "Refresh failed"),
+    });
+  };
 
   const stats = useMemo(() => {
     if (!decisions?.length) return null;
@@ -87,6 +115,22 @@ export default function History() {
           </div>
         ) : (
           <>
+            {/* Patterns / Insights section */}
+            <div className="space-y-4">
+              <InsightCards
+                insights={digest?.insights ?? []}
+                isPro={isPro}
+                onUpgrade={handleUpgrade}
+                onRefresh={handleRefresh}
+                refreshing={refresh.isPending}
+                generatedAt={digest?.generated_at}
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <CategoryBreakdown decisions={decisions} />
+                <HourHeatmap decisions={decisions} />
+              </div>
+            </div>
+
             {/* Hero savings card */}
             {stats && (
               <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6 flex items-center gap-5">

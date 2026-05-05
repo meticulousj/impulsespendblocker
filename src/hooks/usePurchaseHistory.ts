@@ -14,6 +14,9 @@ export interface PurchaseDecision {
   reason: string;
   tip: string;
   created_at: string;
+  category?: string | null;
+  decision_hour?: number | null;
+  decision_dow?: number | null;
 }
 
 export function usePurchaseHistory() {
@@ -38,7 +41,7 @@ export function useSaveDecision() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (decision: Omit<PurchaseDecision, "id" | "created_at">) => {
+    mutationFn: async (decision: Omit<PurchaseDecision, "id" | "created_at" | "decision_hour" | "decision_dow">) => {
       if (!user) throw new Error("Not authenticated");
       const { error } = await supabase.from("purchase_decisions").insert({
         ...decision,

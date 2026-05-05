@@ -10,6 +10,7 @@ import { useSaveDecision } from "@/hooks/usePurchaseHistory";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PersonalityQuiz } from "@/components/PersonalityQuiz";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
+import { classifyCategory, isValidCategory } from "@/lib/categoryClassifier";
 import { supabase } from "@/integrations/supabase/client";
 import { ShieldAlert, History, LogOut, Sparkles, Settings } from "lucide-react";
 import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
@@ -22,6 +23,7 @@ interface Result {
   reason: string;
   tip: string;
   isAI?: boolean;
+  category?: string;
 }
 
 interface FormData {
@@ -96,6 +98,11 @@ export default function Index() {
           analysis = { ...analyzeSpend(data, archetype), isAI: false };
         }
 
+        const category = isValidCategory(analysis.category)
+          ? analysis.category
+          : classifyCategory(data.item);
+        analysis.category = category;
+
         setResult(analysis);
 
         // Save if logged in
@@ -110,6 +117,7 @@ export default function Index() {
             overridden: false,
             reason: analysis.reason,
             tip: analysis.tip,
+            category,
           });
         }
       } catch (err) {
@@ -134,6 +142,7 @@ export default function Index() {
         overridden: true,
         reason: result.reason,
         tip: result.tip,
+        category: result.category ?? classifyCategory(formData.item),
       });
     }
   }, [user, formData, result, saveDecision]);
