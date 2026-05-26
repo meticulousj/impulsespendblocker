@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles, PiggyBank, Timer } from "lucide-react";
-import { computeImpact, formatHours, formatWorkDays } from "@/lib/impactMetrics";
+import { computeImpact, formatHours, formatWorkDays, getImpactDriver } from "@/lib/impactMetrics";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -67,6 +67,8 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
   const impact = showImpact
     ? computeImpact({ price: price!, income: income ?? 0, savings: savings ?? 0 })
     : null;
+  const driver = impact ? getImpactDriver(verdict, impact, { income: income ?? 0, savings: savings ?? 0 }) : null;
+  const driverLabel = verdict === "BUY" ? "Most comfortable" : "Biggest factor";
 
   const handleOverride = () => {
     setOverridden(true);
@@ -111,7 +113,18 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
 
       {impact && (
         <div className="grid grid-cols-2 gap-3 max-w-md mx-auto text-left">
-          <div className="rounded-xl bg-background/60 border border-border/60 p-3">
+          <div
+            className={`relative rounded-xl bg-background/60 p-3 transition-all ${
+              driver === "savings"
+                ? `border-2 ${c.ring.replace("ring-", "border-")} ring-2 ${c.ring} shadow-sm`
+                : "border border-border/60"
+            }`}
+          >
+            {driver === "savings" && (
+              <span className={`absolute -top-2 right-2 rounded-full ${c.bg} ${c.color} px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ring-1 ${c.ring}`}>
+                {driverLabel}
+              </span>
+            )}
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <PiggyBank className="w-3.5 h-3.5" />
               <p className="text-[10px] font-medium uppercase tracking-wider">Savings impact</p>
@@ -133,7 +146,18 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
               </>
             )}
           </div>
-          <div className="rounded-xl bg-background/60 border border-border/60 p-3">
+          <div
+            className={`relative rounded-xl bg-background/60 p-3 transition-all ${
+              driver === "hours"
+                ? `border-2 ${c.ring.replace("ring-", "border-")} ring-2 ${c.ring} shadow-sm`
+                : "border border-border/60"
+            }`}
+          >
+            {driver === "hours" && (
+              <span className={`absolute -top-2 right-2 rounded-full ${c.bg} ${c.color} px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ring-1 ${c.ring}`}>
+                {driverLabel}
+              </span>
+            )}
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Timer className="w-3.5 h-3.5" />
               <p className="text-[10px] font-medium uppercase tracking-wider">Hours of work</p>
