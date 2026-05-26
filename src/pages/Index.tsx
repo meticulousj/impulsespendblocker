@@ -311,6 +311,9 @@ export default function Index() {
               tip={result.tip}
               isAI={result.isAI}
               onOverride={handleOverride}
+              price={formData?.price}
+              income={formData?.income}
+              savings={formData?.savings}
             />
             {(result.verdict === "WAIT" || result.verdict === "SKIP") && formData && (
               <WaitPeriodSuggestion
