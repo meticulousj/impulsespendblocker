@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles } from "lucide-react";
+import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles, PiggyBank, Timer } from "lucide-react";
+import { computeImpact, formatHours, formatWorkDays } from "@/lib/impactMetrics";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -21,6 +22,9 @@ interface VerdictDisplayProps {
   tip: string;
   isAI?: boolean;
   onOverride?: () => void;
+  price?: number;
+  income?: number;
+  savings?: number;
 }
 
 const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: string; bg: string; ring: string }> = {
@@ -54,10 +58,15 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
+
+  const showImpact = typeof price === "number" && price > 0;
+  const impact = showImpact
+    ? computeImpact({ price: price!, income: income ?? 0, savings: savings ?? 0 })
+    : null;
 
   const handleOverride = () => {
     setOverridden(true);
@@ -99,6 +108,45 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride }: Verdi
           </span>
         )}
       </div>
+
+      {impact && (
+        <div className="grid grid-cols-2 gap-3 max-w-md mx-auto text-left">
+          <div className="rounded-xl bg-background/60 border border-border/60 p-3">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <PiggyBank className="w-3.5 h-3.5" />
+              <p className="text-[10px] font-medium uppercase tracking-wider">Savings impact</p>
+            </div>
+            {impact.savingsPct === null ? (
+              <>
+                <p className={`text-base font-bold font-mono mt-1 ${c.color}`}>No buffer</p>
+                <p className="text-[11px] text-muted-foreground">No savings on file</p>
+              </>
+            ) : (
+              <>
+                <p className={`text-base font-bold font-mono mt-1 ${c.color}`}>
+                  {impact.savingsPct >= 100 ? ">100%" : `${impact.savingsPct.toFixed(impact.savingsPct < 10 ? 1 : 0)}%`}
+                </p>
+                <p className="text-[11px] text-muted-foreground font-mono">
+                  ${Math.max(0, impact.savingsAfter).toLocaleString()} left
+                  {impact.savingsAfter < 0 && " (overdraw)"}
+                </p>
+              </>
+            )}
+          </div>
+          <div className="rounded-xl bg-background/60 border border-border/60 p-3">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Timer className="w-3.5 h-3.5" />
+              <p className="text-[10px] font-medium uppercase tracking-wider">Hours of work</p>
+            </div>
+            <p className={`text-base font-bold font-mono mt-1 ${c.color}`}>
+              {formatHours(impact.hours)}
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              {impact.hours >= 40 ? formatWorkDays(impact.workDays) : "at 40h/week"}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3 text-left max-w-md mx-auto">
         <div>
