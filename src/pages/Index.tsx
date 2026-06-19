@@ -13,7 +13,7 @@ import { PersonalityQuiz } from "@/components/PersonalityQuiz";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { classifyCategory, isValidCategory } from "@/lib/categoryClassifier";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldAlert, History, LogOut, Sparkles, Settings, Target } from "lucide-react";
+import { History, LogOut, Sparkles, Settings, Target } from "lucide-react";
 import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
 import { GoalProgressBar } from "@/components/GoalProgressBar";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
