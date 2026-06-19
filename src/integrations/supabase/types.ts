@@ -46,10 +46,12 @@ export type Database = {
       purchase_decisions: {
         Row: {
           category: string | null
+          contributed_amount: number
           created_at: string
           decision_dow: number | null
           decision_hour: number | null
           goal: string
+          goal_id: string | null
           id: string
           income: number
           item: string
@@ -63,10 +65,12 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          contributed_amount?: number
           created_at?: string
           decision_dow?: number | null
           decision_hour?: number | null
           goal?: string
+          goal_id?: string | null
           id?: string
           income: number
           item: string
@@ -80,10 +84,12 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          contributed_amount?: number
           created_at?: string
           decision_dow?: number | null
           decision_hour?: number | null
           goal?: string
+          goal_id?: string | null
           id?: string
           income?: number
           item?: string
@@ -94,6 +100,39 @@ export type Database = {
           tip?: string
           user_id?: string
           verdict?: string
+        }
+        Relationships: []
+      }
+      savings_goals: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          id: string
+          is_active: boolean
+          name: string
+          target_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          target_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          target_amount?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

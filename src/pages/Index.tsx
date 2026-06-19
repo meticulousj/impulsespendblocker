@@ -12,8 +12,11 @@ import { PersonalityQuiz } from "@/components/PersonalityQuiz";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { classifyCategory, isValidCategory } from "@/lib/categoryClassifier";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldAlert, History, LogOut, Sparkles, Settings } from "lucide-react";
+import { ShieldAlert, History, LogOut, Sparkles, Settings, Target } from "lucide-react";
 import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
+import { GoalProgressBar } from "@/components/GoalProgressBar";
+import { useSavingsGoals } from "@/hooks/useSavingsGoals";
+import { computeContribution } from "@/lib/goalContribution";
 import { toast } from "sonner";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
@@ -32,6 +35,7 @@ interface FormData {
   income: number;
   savings: number;
   goal: string;
+  goal_id: string | null;
 }
 
 export default function Index() {
@@ -45,6 +49,9 @@ export default function Index() {
   const { data: profile, isLoading: profileLoading } = useUserProfile();
   const archetype = profile?.archetype ?? null;
   const [quizOpen, setQuizOpen] = useState(false);
+  const { data: goals } = useSavingsGoals();
+  const linkedGoal = formData?.goal_id ? goals?.find((g) => g.id === formData.goal_id) ?? null : null;
+  const activeGoal = goals?.find((g) => g.is_active) ?? null;
 
   // Auto-open quiz for logged-in users who haven't taken it
   useEffect(() => {
@@ -107,6 +114,7 @@ export default function Index() {
 
         // Save if logged in
         if (user) {
+          const contributed = computeContribution(analysis.verdict, false, data.price);
           saveDecision.mutate({
             item: data.item,
             price: data.price,
@@ -118,6 +126,8 @@ export default function Index() {
             reason: analysis.reason,
             tip: analysis.tip,
             category,
+            goal_id: data.goal_id,
+            contributed_amount: contributed,
           });
         }
       } catch (err) {
@@ -143,6 +153,8 @@ export default function Index() {
         reason: result.reason,
         tip: result.tip,
         category: result.category ?? classifyCategory(formData.item),
+        goal_id: formData.goal_id,
+        contributed_amount: 0,
       });
     }
   }, [user, formData, result, saveDecision]);
@@ -203,6 +215,14 @@ export default function Index() {
                 >
                   <History className="w-3.5 h-3.5" />
                   History
+                </Link>
+                <span className="text-border">·</span>
+                <Link
+                  to="/goals"
+                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  Goals
                 </Link>
                 <span className="text-border">·</span>
                 <span className="text-xs text-muted-foreground truncate max-w-[160px]">
@@ -275,6 +295,17 @@ export default function Index() {
         {/* Form or Result */}
         {!result ? (
           <div className="space-y-4">
+            {activeGoal && (
+              <Link
+                to="/goals"
+                className="block rounded-2xl border border-verdict-buy/30 bg-verdict-buy/5 p-4 hover:bg-verdict-buy/10 transition-colors"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-wider text-verdict-buy mb-2">
+                  Active goal
+                </p>
+                <GoalProgressBar goal={activeGoal} compact />
+              </Link>
+            )}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
               <SpendForm onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
@@ -314,6 +345,7 @@ export default function Index() {
               price={formData?.price}
               income={formData?.income}
               savings={formData?.savings}
+              linkedGoal={linkedGoal ?? null}
             />
             {(result.verdict === "WAIT" || result.verdict === "SKIP") && formData && (
               <WaitPeriodSuggestion
