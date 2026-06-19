@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import logoAsset from "@/assets/logo.png.asset.json";
 import { Link, useSearchParams } from "react-router-dom";
 import { SpendForm } from "@/components/SpendForm";
 import { VerdictDisplay } from "@/components/VerdictDisplay";
@@ -12,7 +13,7 @@ import { PersonalityQuiz } from "@/components/PersonalityQuiz";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { classifyCategory, isValidCategory } from "@/lib/categoryClassifier";
 import { supabase } from "@/integrations/supabase/client";
-import { ShieldAlert, History, LogOut, Sparkles, Settings, Target } from "lucide-react";
+import { History, LogOut, Sparkles, Settings, Target } from "lucide-react";
 import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
 import { GoalProgressBar } from "@/components/GoalProgressBar";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
@@ -193,12 +194,11 @@ export default function Index() {
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 text-primary">
-            <ShieldAlert className="w-6 h-6" strokeWidth={2} />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Impulse Spend Blocker
-          </h1>
+          <img
+            src={logoAsset.url}
+            alt="Impulse Spend Blocker logo"
+            className="mx-auto h-20 w-auto"
+          />
           <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
             Before you swipe, let the numbers decide. Enter what you want to buy and your financial snapshot.
           </p>
