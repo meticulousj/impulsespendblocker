@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles, PiggyBank, Timer } from "lucide-react";
 import { computeImpact, formatHours, formatWorkDays, getImpactDriver } from "@/lib/impactMetrics";
+import { GoalProgressBar } from "@/components/GoalProgressBar";
+import type { SavingsGoalWithProgress } from "@/hooks/useSavingsGoals";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -25,6 +27,7 @@ interface VerdictDisplayProps {
   price?: number;
   income?: number;
   savings?: number;
+  linkedGoal?: SavingsGoalWithProgress | null;
 }
 
 const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: string; bg: string; ring: string }> = {
@@ -58,7 +61,7 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
@@ -69,6 +72,14 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
     : null;
   const driver = impact ? getImpactDriver(verdict, impact, { income: income ?? 0, savings: savings ?? 0 }) : null;
   const driverLabel = verdict === "BUY" ? "Most comfortable" : "Biggest factor";
+
+  const willContribute = !overridden && (verdict === "SKIP" || verdict === "WAIT") && typeof price === "number" && price > 0;
+  const showGoalProgress = !!linkedGoal && willContribute;
+  const projectedSaved = linkedGoal ? linkedGoal.progress.saved + (willContribute ? price! : 0) : 0;
+  const projectedPct = linkedGoal && linkedGoal.target_amount > 0
+    ? Math.min(100, (projectedSaved / linkedGoal.target_amount) * 100)
+    : 0;
+  const gainPct = linkedGoal ? projectedPct - linkedGoal.percent : 0;
 
   const handleOverride = () => {
     setOverridden(true);
@@ -169,6 +180,20 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
               {impact.hours >= 40 ? formatWorkDays(impact.workDays) : "at 40h/week"}
             </p>
           </div>
+        </div>
+      )}
+
+      {showGoalProgress && linkedGoal && (
+        <div className={`max-w-md mx-auto rounded-xl bg-background/60 border border-verdict-buy/30 p-4 text-left space-y-3`}>
+          <p className={`text-sm font-medium ${c.color}`}>
+            {verdict === "SKIP" ? "Skipping this" : "Waiting on this"} puts you{" "}
+            <span className="font-bold">{projectedPct.toFixed(projectedPct < 10 ? 1 : 0)}%</span> closer to{" "}
+            <span className="font-bold">{linkedGoal.name}</span>
+            {gainPct > 0 && (
+              <span className="text-muted-foreground font-normal"> (+{gainPct.toFixed(gainPct < 10 ? 1 : 0)}%)</span>
+            )}
+          </p>
+          <GoalProgressBar goal={linkedGoal} pendingContribution={price} compact />
         </div>
       )}
 
