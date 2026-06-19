@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Target } from "lucide-react";
+import { useSavingsGoals } from "@/hooks/useSavingsGoals";
 
 interface SpendFormProps {
-  onSubmit: (data: { item: string; price: number; income: number; savings: number; goal: string }) => void;
+  onSubmit: (data: {
+    item: string;
+    price: number;
+    income: number;
+    savings: number;
+    goal: string;
+    goal_id: string | null;
+  }) => void;
   isLoading: boolean;
 }
 
@@ -13,16 +21,21 @@ export function SpendForm({ onSubmit, isLoading }: SpendFormProps) {
   const [income, setIncome] = useState("");
   const [savings, setSavings] = useState("");
   const [goal, setGoal] = useState("");
+  const [goalId, setGoalId] = useState<string>("");
+  const { data: goals } = useSavingsGoals();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!item.trim() || !price || !income) return;
+    const selected = goals?.find((g) => g.id === goalId) ?? null;
+    const finalGoalText = selected ? selected.name : goal.trim();
     onSubmit({
       item: item.trim(),
       price: parseFloat(price),
       income: parseFloat(income),
       savings: savings ? parseFloat(savings) : 0,
-      goal: goal.trim(),
+      goal: finalGoalText,
+      goal_id: selected ? selected.id : null,
     });
   };
 
@@ -99,14 +112,32 @@ export function SpendForm({ onSubmit, isLoading }: SpendFormProps) {
             <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
               Financial goal
             </label>
-            <input
-              type="text"
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
-              placeholder="e.g. Save for vacation"
-              className={inputClass}
-              maxLength={80}
-            />
+            {goals && goals.length > 0 ? (
+              <div className="relative">
+                <Target className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-verdict-buy" />
+                <select
+                  value={goalId}
+                  onChange={(e) => setGoalId(e.target.value)}
+                  className={`${inputClass} pl-8 appearance-none cursor-pointer`}
+                >
+                  <option value="">No goal linked</option>
+                  {goals.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+                placeholder="e.g. Save for vacation"
+                className={inputClass}
+                maxLength={80}
+              />
+            )}
           </div>
         </div>
       </div>
