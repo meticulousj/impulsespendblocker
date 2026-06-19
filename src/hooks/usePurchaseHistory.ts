@@ -17,6 +17,8 @@ export interface PurchaseDecision {
   category?: string | null;
   decision_hour?: number | null;
   decision_dow?: number | null;
+  goal_id?: string | null;
+  contributed_amount?: number;
 }
 
 export function usePurchaseHistory() {
@@ -51,6 +53,7 @@ export function useSaveDecision() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["purchase_decisions"] });
+      qc.invalidateQueries({ queryKey: ["savings_goals"] });
     },
   });
 }
