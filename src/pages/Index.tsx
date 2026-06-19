@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import logoAsset from "@/assets/logo.png.asset.json";
 import { Link, useSearchParams } from "react-router-dom";
 import { SpendForm } from "@/components/SpendForm";
 import { VerdictDisplay } from "@/components/VerdictDisplay";
