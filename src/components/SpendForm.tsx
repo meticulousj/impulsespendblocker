@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Target } from "lucide-react";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
+import { ReceiptScanner } from "./ReceiptScanner";
 
 interface SpendFormProps {
   onSubmit: (data: {
@@ -44,6 +45,12 @@ export function SpendForm({ onSubmit, isLoading }: SpendFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <ReceiptScanner
+        onExtract={(scannedItem, scannedPrice) => {
+          setItem(scannedItem);
+          setPrice(String(scannedPrice));
+        }}
+      />
       <div className="space-y-4">
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
