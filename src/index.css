@@ -73,6 +73,10 @@
   }
 }
 
+html.text-lg-mode {
+  font-size: 118%;
+}
+
 @keyframes verdict-enter {
   from {
     opacity: 0;
