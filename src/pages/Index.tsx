@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSaveDecision } from "@/hooks/usePurchaseHistory";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PersonalityQuiz } from "@/components/PersonalityQuiz";
+import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { classifyCategory, isValidCategory } from "@/lib/categoryClassifier";
 import { supabase } from "@/integrations/supabase/client";
@@ -207,6 +208,8 @@ export default function Index() {
         {/* Auth bar */}
         {!authLoading && (
           <div className="flex items-center justify-center gap-3">
+            <TextSizeToggle />
+            <span className="text-border">·</span>
             {user ? (
               <>
                 <Link
