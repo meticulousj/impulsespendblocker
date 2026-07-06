@@ -7,7 +7,10 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index.tsx";
 import History from "./pages/History.tsx";
 import Goals from "./pages/Goals.tsx";
+import Insights from "./pages/Insights.tsx";
+import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import AppLayout from "./components/AppLayout";
 
 const queryClient = new QueryClient();
 
@@ -19,9 +22,13 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/goals" element={<Goals />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/insights" element={<Insights />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
