@@ -5,12 +5,25 @@ import { usePurchaseHistory } from "@/hooks/usePurchaseHistory";
 import { CategoryBreakdown } from "@/components/CategoryBreakdown";
 import { HourHeatmap } from "@/components/HourHeatmap";
 import { InsightCards } from "@/components/InsightCards";
-import { useLatestDigest } from "@/hooks/useInsights";
+import { useLatestDigest, useRefreshInsights } from "@/hooks/useInsights";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function Insights() {
   const { user, isPro } = useAuth();
   const { data: decisions } = usePurchaseHistory();
   const { data: digest } = useLatestDigest();
+  const refresh = useRefreshInsights();
+
+  const handleUpgrade = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout");
+      if (error || data?.error) throw new Error(data?.error || "Checkout failed");
+      if (data?.url) window.open(data.url, "_blank");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Checkout failed");
+    }
+  };
 
   if (!user) {
     return (
@@ -41,17 +54,16 @@ export default function Insights() {
         </p>
       </header>
 
-      {digest && isPro && <InsightCards digest={digest} />}
-
-      <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-        <h2 className="text-sm font-semibold mb-3">By category</h2>
-        <CategoryBreakdown decisions={decisions ?? []} />
-      </section>
-
-      <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-        <h2 className="text-sm font-semibold mb-3">When impulses hit</h2>
-        <HourHeatmap decisions={decisions ?? []} />
-      </section>
+      <InsightCards
+        insights={digest?.insights ?? []}
+        isPro={isPro}
+        onUpgrade={handleUpgrade}
+        onRefresh={() => refresh.mutate()}
+        refreshing={refresh.isPending}
+        generatedAt={digest?.generated_at}
+      />
+      <CategoryBreakdown decisions={decisions ?? []} />
+      <HourHeatmap decisions={decisions ?? []} />
     </div>
   );
 }
