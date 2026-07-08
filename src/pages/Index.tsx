@@ -212,22 +212,6 @@ export default function Index() {
             <span className="text-border">·</span>
             {user ? (
               <>
-                <Link
-                  to="/history"
-                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <History className="w-3.5 h-3.5" />
-                  History
-                </Link>
-                <span className="text-border">·</span>
-                <Link
-                  to="/goals"
-                  className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Target className="w-3.5 h-3.5" />
-                  Goals
-                </Link>
-                <span className="text-border">·</span>
                 <span className="text-xs text-muted-foreground truncate max-w-[160px]">
                   {user.email}
                 </span>
