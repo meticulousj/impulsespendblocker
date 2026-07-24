@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Home, History, Target, Sparkles, Settings } from "lucide-react";
+import { Home, History, Target, Sparkles, User2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
@@ -7,7 +7,7 @@ const tabs = [
   { to: "/history", label: "History", icon: History },
   { to: "/goals", label: "Goals", icon: Target },
   { to: "/insights", label: "Insights", icon: Sparkles },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/profile", label: "Profile", icon: User2 },
 ];
 
 export default function AppLayout() {
