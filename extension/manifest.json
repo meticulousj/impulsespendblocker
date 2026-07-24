@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Impulse Spend Blocker",
+  "version": "1.0.0",
+  "description": "Analyze any purchase on Amazon, Shopify, and more with a BUY / WAIT / SKIP verdict before you check out.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  "icons": {
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://*.amazon.com/*",
+    "https://*.amazon.co.uk/*",
+    "https://*.amazon.ca/*",
+    "https://*.amazon.de/*",
+    "https://*.amazon.fr/*",
+    "https://*.amazon.es/*",
+    "https://*.amazon.it/*",
+    "https://*.amazon.co.jp/*",
+    "https://*.amazon.com.au/*",
+    "https://*.myshopify.com/*",
+    "https://*.shopify.com/*",
+    "https://*.ebay.com/*",
+    "https://*.etsy.com/*",
+    "https://*.target.com/*",
+    "https://*.bestbuy.com/*",
+    "https://*.walmart.com/*"
+  ]
+}

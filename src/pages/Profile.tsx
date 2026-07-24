@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, CreditCard, Sparkles, User2, Type, Wand2 } from "lucide-react";
+import { LogOut, CreditCard, Sparkles, User2, Type, Wand2, Download, Share2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
@@ -35,6 +35,23 @@ export default function Profile() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not open subscription portal");
     }
+  };
+
+  const handleDownloadExtension = () => {
+    fetch("/impulse-blocker-extension.zip")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "impulse-blocker-extension.zip";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast.success("Extension downloaded. Unzip and load it in chrome://extensions.");
+      })
+      .catch((err) => toast.error(err.message));
   };
 
   return (
@@ -121,6 +138,33 @@ export default function Profile() {
                 Text size
               </span>
               <TextSizeToggle />
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Analyze anywhere
+            </p>
+            <button
+              onClick={handleDownloadExtension}
+              className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Chrome extension
+              </span>
+              <span className="text-muted-foreground">.zip →</span>
+            </button>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Scan prices on Amazon, Shopify stores, eBay, Etsy, Target, Best Buy & Walmart.
+              Unzip → chrome://extensions → Load unpacked.
+            </p>
+            <div className="flex items-center gap-2 rounded-xl bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+              <Share2 className="w-4 h-4 text-primary shrink-0" />
+              <span>
+                On iOS/Android: open this app in your browser, tap Share → Add to Home Screen.
+                Then share any product page → Impulse Blocker.
+              </span>
             </div>
           </section>
 
