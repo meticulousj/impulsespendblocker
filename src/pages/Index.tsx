@@ -332,7 +332,12 @@ export default function Index() {
               </Link>
             )}
             <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
-              <SpendForm onSubmit={handleSubmit} isLoading={isLoading} />
+              <SpendForm
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+                initialItem={prefill?.item}
+                initialPrice={prefill?.price}
+              />
             </div>
 
             {/* Upgrade CTA for non-pro users */}
