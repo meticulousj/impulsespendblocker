@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, CreditCard, Sparkles, User2, Type, Wand2 } from "lucide-react";
+import { LogOut, CreditCard, Sparkles, User2, Type, Wand2, Download, Share2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
@@ -35,6 +35,23 @@ export default function Profile() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not open subscription portal");
     }
+  };
+
+  const handleDownloadExtension = () => {
+    fetch("/impulse-blocker-extension.zip")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "impulse-blocker-extension.zip";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast.success("Extension downloaded. Unzip and load it in chrome://extensions.");
+      })
+      .catch((err) => toast.error(err.message));
   };
 
   return (
