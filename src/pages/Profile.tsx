@@ -11,7 +11,7 @@ import { ProBadge } from "@/components/ProBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export default function Settings() {
+export default function Profile() {
   const { user, signOut, isPro } = useAuth();
   const { data: profile } = useUserProfile();
   const archetype = profile?.archetype ?? null;
@@ -40,9 +40,9 @@ export default function Settings() {
   return (
     <div className="mx-auto max-w-md px-4 py-8 space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-display font-semibold">Settings</h1>
+        <h1 className="text-2xl font-display font-semibold">Profile</h1>
         <p className="text-sm text-muted-foreground">
-          Manage your account, subscription, and preferences.
+          Your account, saved settings, and plan.
         </p>
       </header>
 
