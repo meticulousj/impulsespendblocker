@@ -141,6 +141,33 @@ export default function Profile() {
             </div>
           </section>
 
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Analyze anywhere
+            </p>
+            <button
+              onClick={handleDownloadExtension}
+              className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Chrome extension
+              </span>
+              <span className="text-muted-foreground">.zip →</span>
+            </button>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Scan prices on Amazon, Shopify stores, eBay, Etsy, Target, Best Buy & Walmart.
+              Unzip → chrome://extensions → Load unpacked.
+            </p>
+            <div className="flex items-center gap-2 rounded-xl bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+              <Share2 className="w-4 h-4 text-primary shrink-0" />
+              <span>
+                On iOS/Android: open this app in your browser, tap Share → Add to Home Screen.
+                Then share any product page → Impulse Blocker.
+              </span>
+            </div>
+          </section>
+
           <button
             onClick={signOut}
             className="w-full flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
