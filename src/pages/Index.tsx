@@ -55,6 +55,44 @@ export default function Index() {
   const linkedGoal = formData?.goal_id ? goals?.find((g) => g.id === formData.goal_id) ?? null : null;
   const activeGoal = goals?.find((g) => g.is_active) ?? null;
 
+  // Prefill from browser extension (?item=&price=) or PWA share target (?title=&text=&url=)
+  const [prefill, setPrefill] = useState<{ item: string; price: string } | null>(null);
+  useEffect(() => {
+    const item = searchParams.get("item");
+    const price = searchParams.get("price");
+    const title = searchParams.get("title");
+    const text = searchParams.get("text");
+    const url = searchParams.get("url");
+
+    if (item || price) {
+      setPrefill({ item: item ?? "", price: price ?? "" });
+      const next = new URLSearchParams(searchParams);
+      ["item", "price", "src"].forEach((k) => next.delete(k));
+      setSearchParams(next, { replace: true });
+      toast.success("Purchase details loaded — add income to get a verdict.");
+    } else if (title || text || url) {
+      const blob = [title, text, url].filter(Boolean).join(" ");
+      const match = blob.match(/(?:USD|US\$|\$|€|£|¥)\s?([\d]{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?)/i);
+      let priceGuess = "";
+      if (match) {
+        const raw = match[1];
+        const lastComma = raw.lastIndexOf(",");
+        const lastDot = raw.lastIndexOf(".");
+        const normalized = lastComma > lastDot
+          ? raw.replace(/\./g, "").replace(",", ".")
+          : raw.replace(/,/g, "");
+        priceGuess = String(parseFloat(normalized) || "");
+      }
+      const itemGuess = (title || text || url || "").slice(0, 120);
+      setPrefill({ item: itemGuess, price: priceGuess });
+      const next = new URLSearchParams(searchParams);
+      ["title", "text", "url"].forEach((k) => next.delete(k));
+      setSearchParams(next, { replace: true });
+      toast.success("Shared item loaded — confirm the price and analyze.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Auto-open quiz for logged-in users who haven't taken it
   useEffect(() => {
     if (user && !profileLoading && !profile) {
