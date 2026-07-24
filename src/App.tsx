@@ -8,7 +8,7 @@ import Index from "./pages/Index.tsx";
 import History from "./pages/History.tsx";
 import Goals from "./pages/Goals.tsx";
 import Insights from "./pages/Insights.tsx";
-import Settings from "./pages/Settings.tsx";
+import Profile from "./pages/Profile.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AppLayout from "./components/AppLayout";
 
@@ -27,7 +27,7 @@ const App = () => (
               <Route path="/history" element={<History />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/insights" element={<Insights />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
