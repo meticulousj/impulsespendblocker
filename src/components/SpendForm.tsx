@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Target } from "lucide-react";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
@@ -14,16 +14,23 @@ interface SpendFormProps {
     goal_id: string | null;
   }) => void;
   isLoading: boolean;
+  initialItem?: string;
+  initialPrice?: string;
 }
 
-export function SpendForm({ onSubmit, isLoading }: SpendFormProps) {
-  const [item, setItem] = useState("");
-  const [price, setPrice] = useState("");
+export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice }: SpendFormProps) {
+  const [item, setItem] = useState(initialItem ?? "");
+  const [price, setPrice] = useState(initialPrice ?? "");
   const [income, setIncome] = useState("");
   const [savings, setSavings] = useState("");
   const [goal, setGoal] = useState("");
   const [goalId, setGoalId] = useState<string>("");
   const { data: goals } = useSavingsGoals();
+
+  useEffect(() => {
+    if (initialItem) setItem(initialItem);
+    if (initialPrice) setPrice(initialPrice);
+  }, [initialItem, initialPrice]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
