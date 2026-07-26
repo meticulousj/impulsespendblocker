@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_rules: {
+        Row: {
+          category: string | null
+          created_at: string
+          days_of_week: number[] | null
+          end_hour: number | null
+          id: string
+          is_active: boolean
+          max_price: number | null
+          min_price: number | null
+          name: string
+          priority: number
+          start_hour: number | null
+          updated_at: string
+          user_id: string
+          verdict: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          days_of_week?: number[] | null
+          end_hour?: number | null
+          id?: string
+          is_active?: boolean
+          max_price?: number | null
+          min_price?: number | null
+          name: string
+          priority?: number
+          start_hour?: number | null
+          updated_at?: string
+          user_id: string
+          verdict: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          days_of_week?: number[] | null
+          end_hour?: number | null
+          id?: string
+          is_active?: boolean
+          max_price?: number | null
+          min_price?: number | null
+          name?: string
+          priority?: number
+          start_hour?: number | null
+          updated_at?: string
+          user_id?: string
+          verdict?: string
+        }
+        Relationships: []
+      }
       digest_dismissals: {
         Row: {
           digest_id: string
