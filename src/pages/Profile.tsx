@@ -155,7 +155,7 @@ export default function Profile() {
 
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Accessibility (display)
+              Accessibility
             </p>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm">
