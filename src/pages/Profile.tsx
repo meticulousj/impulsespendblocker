@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, CreditCard, Sparkles, User2, Type, Wand2, Download, Share2 } from "lucide-react";
+import { LogOut, CreditCard, Sparkles, User2, Type, Wand2, Download, Share2, Gavel } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
@@ -131,6 +131,31 @@ export default function Profile() {
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Accessibility
+            </p>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Custom rules
+            </p>
+            <Link
+              to="/rules"
+              className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Gavel className="w-4 h-4" />
+                Manage my rules
+              </span>
+              <span className="text-muted-foreground">→</span>
+            </Link>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              e.g. "Always SKIP anything over $50 after 10pm." Rules override every verdict they match.
+            </p>
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Accessibility (display)
             </p>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-2 text-sm">
