@@ -19,6 +19,8 @@ import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
 import { GoalProgressBar } from "@/components/GoalProgressBar";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
 import { computeContribution } from "@/lib/goalContribution";
+import { useCustomRules } from "@/hooks/useCustomRules";
+import { findMatchingRule, describeRule } from "@/lib/customRules";
 import { toast } from "sonner";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
@@ -29,6 +31,7 @@ interface Result {
   tip: string;
   isAI?: boolean;
   category?: string;
+  ruleName?: string;
 }
 
 interface FormData {
@@ -52,6 +55,7 @@ export default function Index() {
   const archetype = profile?.archetype ?? null;
   const [quizOpen, setQuizOpen] = useState(false);
   const { data: goals } = useSavingsGoals();
+  const { data: customRules } = useCustomRules();
   const linkedGoal = formData?.goal_id ? goals?.find((g) => g.id === formData.goal_id) ?? null : null;
   const activeGoal = goals?.find((g) => g.is_active) ?? null;
 
@@ -150,6 +154,21 @@ export default function Index() {
           : classifyCategory(data.item);
         analysis.category = category;
 
+        // Custom rules override everything they match
+        const rule = findMatchingRule(customRules, { price: data.price, category });
+        if (rule && rule.verdict !== analysis.verdict) {
+          analysis = {
+            ...analysis,
+            verdict: rule.verdict,
+            reason: `Your rule "${rule.name}" applies: ${describeRule(rule)}. That overrides the ${analysis.verdict} we would have given.`,
+            tip: analysis.reason,
+            ruleName: rule.name,
+          };
+          toast(`Custom rule applied: ${rule.name}`);
+        } else if (rule) {
+          analysis = { ...analysis, ruleName: rule.name };
+        }
+
         setResult(analysis);
 
         // Save if logged in
@@ -177,7 +196,7 @@ export default function Index() {
         setIsLoading(false);
       }
     },
-    [useAI, isPro, user, saveDecision, archetype]
+    [useAI, isPro, user, saveDecision, archetype, customRules]
   );
 
   const handleOverride = useCallback(() => {
