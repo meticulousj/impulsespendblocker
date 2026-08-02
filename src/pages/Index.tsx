@@ -395,6 +395,7 @@ export default function Index() {
               income={formData?.income}
               savings={formData?.savings}
               linkedGoal={linkedGoal ?? null}
+              emergencyFundTarget={profile?.emergency_fund_target ?? null}
             />
             {(result.verdict === "WAIT" || result.verdict === "SKIP") && formData && (
               <WaitPeriodSuggestion

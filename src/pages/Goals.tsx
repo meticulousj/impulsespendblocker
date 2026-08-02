@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Target, Trash2, Pencil, Star, StarOff } from "lucide-react";
+import { ArrowLeft, Plus, Target, Trash2, Pencil, Star, StarOff, ShieldCheck } from "lucide-react";
 import {
   useSavingsGoals,
   useCreateGoal,
   useUpdateGoal,
   useDeleteGoal,
   useSetActiveGoal,
+  GOAL_TYPES,
+  type GoalType,
   type SavingsGoalWithProgress,
 } from "@/hooks/useSavingsGoals";
+import { useUserProfile, useSaveEmergencyFundTarget } from "@/hooks/useUserProfile";
 import { GoalProgressBar } from "@/components/GoalProgressBar";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,14 +47,20 @@ function GoalDialog({
   title,
 }: {
   trigger: React.ReactNode;
-  initial?: { name: string; target_amount: number; deadline: string | null };
-  onSubmit: (v: { name: string; target_amount: number; deadline: string | null }) => Promise<void> | void;
+  initial?: { name: string; target_amount: number; deadline: string | null; goal_type: GoalType };
+  onSubmit: (v: {
+    name: string;
+    target_amount: number;
+    deadline: string | null;
+    goal_type: GoalType;
+  }) => Promise<void> | void;
   title: string;
 }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(initial?.name ?? "");
   const [target, setTarget] = useState(initial ? String(initial.target_amount) : "");
   const [deadline, setDeadline] = useState(initial?.deadline ?? "");
+  const [goalType, setGoalType] = useState<GoalType>(initial?.goal_type ?? "vacation");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,12 +70,14 @@ function GoalDialog({
       name: name.trim(),
       target_amount: amount,
       deadline: deadline || null,
+      goal_type: goalType,
     });
     setOpen(false);
     if (!initial) {
       setName("");
       setTarget("");
       setDeadline("");
+      setGoalType("vacation");
     }
   };
 
@@ -81,6 +92,27 @@ function GoalDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+              Goal type
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {GOAL_TYPES.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setGoalType(t.value)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                    goalType === t.value
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
               Goal name
@@ -166,7 +198,12 @@ function GoalCard({ goal }: { goal: SavingsGoalWithProgress }) {
         </button>
         <GoalDialog
           title="Edit goal"
-          initial={{ name: goal.name, target_amount: goal.target_amount, deadline: goal.deadline }}
+          initial={{
+            name: goal.name,
+            target_amount: goal.target_amount,
+            deadline: goal.deadline,
+            goal_type: goal.goal_type ?? "other",
+          }}
           onSubmit={async (v) => {
             await update.mutateAsync({ id: goal.id, patch: v });
             toast.success("Goal updated");
@@ -204,6 +241,49 @@ function GoalCard({ goal }: { goal: SavingsGoalWithProgress }) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+    </div>
+  );
+}
+
+function EmergencyFundCard() {
+  const { data: profile } = useUserProfile();
+  const save = useSaveEmergencyFundTarget();
+  const [value, setValue] = useState<string | null>(null);
+  const current = profile?.emergency_fund_target ?? null;
+  const shown = value ?? (current !== null ? String(current) : "");
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+      <div className="flex items-center gap-2">
+        <ShieldCheck className="w-4 h-4 text-primary" />
+        <h2 className="text-sm font-semibold">Emergency fund target</h2>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        Used in the "If you don't buy this…" panel to show how close each skip gets you to a full safety net.
+      </p>
+      <form
+        className="flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const parsed = shown.trim() === "" ? null : parseFloat(shown);
+          if (parsed !== null && (!isFinite(parsed) || parsed <= 0)) return;
+          save.mutate(parsed, { onSuccess: () => toast.success("Emergency fund target saved") });
+        }}
+      >
+        <input
+          type="number"
+          min="0"
+          step="1"
+          inputMode="decimal"
+          placeholder="10000"
+          className={`${inputClass} font-mono`}
+          value={shown}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <Button type="submit" className="rounded-xl shrink-0" disabled={save.isPending}>
+          Save
+        </Button>
+      </form>
     </div>
   );
 }
@@ -258,6 +338,8 @@ export default function Goals() {
             Every SKIP you honor stacks toward what you actually want.
           </p>
         </div>
+
+        <EmergencyFundCard />
 
         {isLoading ? (
           <p className="text-center text-sm text-muted-foreground">Loading…</p>
