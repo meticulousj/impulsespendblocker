@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles, PiggyBank, Timer } from "lucide-react";
-import { computeImpact, formatHours, formatWorkDays, getImpactDriver } from "@/lib/impactMetrics";
+import { ShieldCheck, Clock, XCircle, PartyPopper, Sparkles, PiggyBank, Timer, TrendingUp, Check } from "lucide-react";
+import { computeImpact, computeOpportunityCost, formatHours, formatWorkDays, getImpactDriver } from "@/lib/impactMetrics";
 import { GoalProgressBar } from "@/components/GoalProgressBar";
 import type { SavingsGoalWithProgress } from "@/hooks/useSavingsGoals";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,15 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
     ? Math.min(100, (projectedSaved / linkedGoal.target_amount) * 100)
     : 0;
   const gainPct = linkedGoal ? projectedPct - linkedGoal.percent : 0;
+
+  const opportunity = showImpact
+    ? computeOpportunityCost({
+        price: price!,
+        savings: savings ?? 0,
+        goalName: linkedGoal?.name,
+        goalRemaining: linkedGoal ? Math.max(0, linkedGoal.target_amount - linkedGoal.progress.saved) : null,
+      })
+    : null;
 
   const handleOverride = () => {
     setOverridden(true);
@@ -180,6 +189,24 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
               {impact.hours >= 40 ? formatWorkDays(impact.workDays) : "at 40h/week"}
             </p>
           </div>
+        </div>
+      )}
+
+      {opportunity && verdict !== "BUY" && (
+        <div className="max-w-md mx-auto rounded-xl bg-background/60 border border-border/60 p-4 text-left space-y-3">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <TrendingUp className="w-3.5 h-3.5" />
+            <p className="text-[10px] font-medium uppercase tracking-wider">If you don't buy this…</p>
+          </div>
+          <p className="text-sm font-medium text-foreground/90">You'll have:</p>
+          <ul className="space-y-2">
+            {opportunity.lines.map((line) => (
+              <li key={line.key} className="flex items-start gap-2 text-sm">
+                <Check className={`w-4 h-4 shrink-0 mt-0.5 ${c.color}`} strokeWidth={2.5} />
+                <span className="text-foreground/80 leading-snug">{line.text}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
