@@ -68,3 +68,78 @@ export function formatWorkDays(workDays: number): string {
   const rounded = workDays < 10 ? workDays.toFixed(1) : Math.round(workDays).toString();
   return `~${rounded} work days`;
 }
+
+// ---------- Opportunity cost ("If you don't buy this...") ----------
+
+const ANNUAL_RETURN = 0.05;
+
+export interface OpportunityLine {
+  key: string;
+  text: string;
+}
+
+export interface OpportunityCost {
+  oneYearValue: number;
+  fiveYearValue: number;
+  emergencyFundGrowthPct: number | null;
+  lines: OpportunityLine[];
+}
+
+const EQUIVALENTS: { min: number; label: string }[] = [
+  { min: 4000, label: "a month-long trip abroad" },
+  { min: 2000, label: "a two-week vacation" },
+  { min: 1000, label: "a long weekend getaway, twice over" },
+  { min: 500, label: "a weekend getaway" },
+  { min: 200, label: "a month of groceries" },
+  { min: 60, label: "a week of groceries" },
+  { min: 20, label: "a nice dinner out" },
+];
+
+function money(n: number): string {
+  return `$${Math.round(n).toLocaleString()}`;
+}
+
+export function computeOpportunityCost({
+  price,
+  savings,
+  goalName,
+  goalRemaining,
+}: {
+  price: number;
+  savings: number;
+  goalName?: string | null;
+  goalRemaining?: number | null;
+}): OpportunityCost {
+  const oneYearValue = price * (1 + ANNUAL_RETURN);
+  const fiveYearValue = price * Math.pow(1 + ANNUAL_RETURN, 5);
+  const emergencyFundGrowthPct = savings > 0 ? (price / savings) * 100 : null;
+
+  const lines: OpportunityLine[] = [
+    { key: "year", text: `${money(oneYearValue)} in one year (invested at 5%)` },
+  ];
+
+  if (goalName && typeof goalRemaining === "number" && goalRemaining > 0) {
+    const pct = Math.min(100, (price / goalRemaining) * 100);
+    lines.push({
+      key: "goal",
+      text:
+        price >= goalRemaining
+          ? `enough to fully fund ${goalName}`
+          : `${pct.toFixed(pct < 10 ? 1 : 0)}% of what's left for ${goalName}`,
+    });
+  } else {
+    const eq = EQUIVALENTS.find((e) => price >= e.min);
+    if (eq) lines.push({ key: "equiv", text: `enough for ${eq.label}` });
+  }
+
+  if (emergencyFundGrowthPct !== null) {
+    lines.push({
+      key: "fund",
+      text: `emergency fund grows ${emergencyFundGrowthPct >= 100 ? ">100" : emergencyFundGrowthPct.toFixed(emergencyFundGrowthPct < 10 ? 1 : 0)}%`,
+    });
+  }
+
+  lines.push({ key: "five", text: `${money(fiveYearValue)} in five years if left invested` });
+
+  return { oneYearValue, fiveYearValue, emergencyFundGrowthPct, lines };
+}
