@@ -28,6 +28,7 @@ interface VerdictDisplayProps {
   income?: number;
   savings?: number;
   linkedGoal?: SavingsGoalWithProgress | null;
+  emergencyFundTarget?: number | null;
 }
 
 const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: string; bg: string; ring: string }> = {
@@ -61,7 +62,7 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal, emergencyFundTarget }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
@@ -87,6 +88,8 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
         savings: savings ?? 0,
         goalName: linkedGoal?.name,
         goalRemaining: linkedGoal ? Math.max(0, linkedGoal.target_amount - linkedGoal.progress.saved) : null,
+        goalType: linkedGoal?.goal_type,
+        emergencyFundTarget: emergencyFundTarget ?? null,
       })
     : null;
 

@@ -10,9 +10,20 @@ export interface SavingsGoal {
   target_amount: number;
   deadline: string | null;
   is_active: boolean;
+  goal_type: GoalType;
   created_at: string;
   updated_at: string;
 }
+
+export type GoalType = "vacation" | "house" | "debt" | "emergency" | "other";
+
+export const GOAL_TYPES: { value: GoalType; label: string }[] = [
+  { value: "vacation", label: "Vacation" },
+  { value: "house", label: "House" },
+  { value: "debt", label: "Debt payoff" },
+  { value: "emergency", label: "Emergency fund" },
+  { value: "other", label: "Other" },
+];
 
 export interface GoalProgress {
   saved: number;
@@ -88,6 +99,7 @@ export function useCreateGoal() {
       target_amount: number;
       deadline?: string | null;
       is_active?: boolean;
+      goal_type?: GoalType;
     }) => {
       if (!user) throw new Error("Not authenticated");
       const { error } = await supabase.from("savings_goals").insert({
@@ -96,6 +108,7 @@ export function useCreateGoal() {
         target_amount: input.target_amount,
         deadline: input.deadline ?? null,
         is_active: input.is_active ?? true,
+        goal_type: input.goal_type ?? "other",
       });
       if (error) throw error;
     },
@@ -111,7 +124,7 @@ export function useUpdateGoal() {
       patch,
     }: {
       id: string;
-      patch: Partial<Pick<SavingsGoal, "name" | "target_amount" | "deadline" | "is_active">>;
+      patch: Partial<Pick<SavingsGoal, "name" | "target_amount" | "deadline" | "is_active" | "goal_type">>;
     }) => {
       const { error } = await supabase.from("savings_goals").update(patch).eq("id", id);
       if (error) throw error;

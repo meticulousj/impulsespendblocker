@@ -158,6 +158,7 @@ export type Database = {
         Row: {
           created_at: string
           deadline: string | null
+          goal_type: string
           id: string
           is_active: boolean
           name: string
@@ -168,6 +169,7 @@ export type Database = {
         Insert: {
           created_at?: string
           deadline?: string | null
+          goal_type?: string
           id?: string
           is_active?: boolean
           name: string
@@ -178,6 +180,7 @@ export type Database = {
         Update: {
           created_at?: string
           deadline?: string | null
+          goal_type?: string
           id?: string
           is_active?: boolean
           name?: string
@@ -191,13 +194,15 @@ export type Database = {
         Row: {
           archetype: string
           created_at: string
+          emergency_fund_target: number | null
           quiz_completed_at: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          archetype: string
+          archetype?: string
           created_at?: string
+          emergency_fund_target?: number | null
           quiz_completed_at?: string
           updated_at?: string
           user_id: string
@@ -205,6 +210,7 @@ export type Database = {
         Update: {
           archetype?: string
           created_at?: string
+          emergency_fund_target?: number | null
           quiz_completed_at?: string
           updated_at?: string
           user_id?: string

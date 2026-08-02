@@ -104,11 +104,15 @@ export function computeOpportunityCost({
   savings,
   goalName,
   goalRemaining,
+  goalType,
+  emergencyFundTarget,
 }: {
   price: number;
   savings: number;
   goalName?: string | null;
   goalRemaining?: number | null;
+  goalType?: string | null;
+  emergencyFundTarget?: number | null;
 }): OpportunityCost {
   const oneYearValue = price * (1 + ANNUAL_RETURN);
   const fiveYearValue = price * Math.pow(1 + ANNUAL_RETURN, 5);
@@ -120,19 +124,35 @@ export function computeOpportunityCost({
 
   if (goalName && typeof goalRemaining === "number" && goalRemaining > 0) {
     const pct = Math.min(100, (price / goalRemaining) * 100);
+    const verb =
+      goalType === "debt"
+        ? `knocked off ${goalName}`
+        : goalType === "house"
+          ? `toward ${goalName}`
+          : `of what's left for ${goalName}`;
     lines.push({
       key: "goal",
       text:
         price >= goalRemaining
           ? `enough to fully fund ${goalName}`
-          : `${pct.toFixed(pct < 10 ? 1 : 0)}% of what's left for ${goalName}`,
+          : `${pct.toFixed(pct < 10 ? 1 : 0)}% ${verb}`,
     });
   } else {
     const eq = EQUIVALENTS.find((e) => price >= e.min);
     if (eq) lines.push({ key: "equiv", text: `enough for ${eq.label}` });
   }
 
-  if (emergencyFundGrowthPct !== null) {
+  if (typeof emergencyFundTarget === "number" && emergencyFundTarget > 0) {
+    const before = Math.min(100, (savings / emergencyFundTarget) * 100);
+    const after = Math.min(100, ((savings + price) / emergencyFundTarget) * 100);
+    const delta = after - before;
+    lines.push({
+      key: "fund",
+      text: `emergency fund at ${after.toFixed(after < 10 ? 1 : 0)}% of your ${money(emergencyFundTarget)} target${
+        delta > 0 ? ` (+${delta.toFixed(delta < 10 ? 1 : 0)}%)` : ""
+      }`,
+    });
+  } else if (emergencyFundGrowthPct !== null) {
     lines.push({
       key: "fund",
       text: `emergency fund grows ${emergencyFundGrowthPct >= 100 ? ">100" : emergencyFundGrowthPct.toFixed(emergencyFundGrowthPct < 10 ? 1 : 0)}%`,
