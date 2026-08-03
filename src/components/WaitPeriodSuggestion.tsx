@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Clock, Timer, CalendarClock, CheckCircle2 } from "lucide-react";
 import type { Archetype } from "@/lib/archetypeConfig";
-import { ARCHETYPES } from "@/lib/archetypeConfig";
+import { getSuggestedPeriod } from "@/lib/waitPeriod";
 
 interface WaitPeriodSuggestionProps {
   price: number;
@@ -16,16 +16,6 @@ const periods = [
   { hours: 48, label: "48 hours", icon: Clock, desc: "Standard hold" },
   { hours: 168, label: "7 days", icon: CalendarClock, desc: "Deep reflection" },
 ];
-
-function getSuggestedPeriod(price: number, income: number, verdict: "WAIT" | "SKIP", archetype?: Archetype | null): number {
-  const ratio = price / income;
-  let tier = 0; // 0=24h, 1=48h, 2=7d
-  if (verdict === "SKIP" || ratio > 0.25) tier = 2;
-  else if (ratio > 0.1) tier = 1;
-  const shift = archetype ? ARCHETYPES[archetype].waitTierShift : 0;
-  tier = Math.max(0, Math.min(2, tier + shift));
-  return [24, 48, 168][tier];
-}
 
 export function WaitPeriodSuggestion({ price, income, verdict, archetype, onSetReminder }: WaitPeriodSuggestionProps) {
   const [selected, setSelected] = useState<number | null>(null);

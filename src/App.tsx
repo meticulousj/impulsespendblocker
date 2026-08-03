@@ -10,6 +10,8 @@ import Goals from "./pages/Goals.tsx";
 import Insights from "./pages/Insights.tsx";
 import Profile from "./pages/Profile.tsx";
 import Rules from "./pages/Rules.tsx";
+import OnHold from "./pages/OnHold.tsx";
+import DecisionDetail from "./pages/DecisionDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AppLayout from "./components/AppLayout";
 
@@ -26,6 +28,8 @@ const App = () => (
             <Route element={<AppLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/history" element={<History />} />
+              <Route path="/history/:id" element={<DecisionDetail />} />
+              <Route path="/waits" element={<OnHold />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/profile" element={<Profile />} />

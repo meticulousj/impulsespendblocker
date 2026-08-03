@@ -97,6 +97,12 @@ export default function History() {
             <h1 className="text-xl font-bold tracking-tight">Purchase Dashboard</h1>
             <p className="text-xs text-muted-foreground">Your spending decisions & savings over time</p>
           </div>
+          <Link
+            to="/waits"
+            className="ml-auto rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-accent transition-colors"
+          >
+            On hold →
+          </Link>
         </div>
 
         {isLoading ? (
@@ -260,9 +266,10 @@ export default function History() {
                   const cfg = verdictConfig[v] || verdictConfig.BUY;
                   const Icon = d.overridden ? PartyPopper : cfg.icon;
                   return (
-                    <div
+                    <Link
                       key={d.id}
-                      className="flex items-center gap-4 rounded-xl bg-card border border-border p-4 hover:shadow-sm transition-shadow"
+                      to={`/history/${d.id}`}
+                      className="flex items-center gap-4 rounded-xl bg-card border border-border p-4 hover:shadow-sm hover:border-primary/30 transition-all active:scale-[0.99]"
                     >
                       <div className={`shrink-0 w-10 h-10 rounded-lg ${cfg.bg} ${cfg.color} flex items-center justify-center`}>
                         <Icon className="w-5 h-5" strokeWidth={2} />
@@ -277,7 +284,7 @@ export default function History() {
                         </p>
                       </div>
                       <span className={`shrink-0 text-xs font-bold font-mono ${cfg.color}`}>{d.verdict}</span>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>

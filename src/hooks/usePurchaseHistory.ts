@@ -57,3 +57,53 @@ export function useSaveDecision() {
     },
   });
 }
+
+export function useDecision(id?: string) {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["purchase_decision", id],
+    enabled: !!user && !!id,
+    queryFn: async (): Promise<PurchaseDecision | null> => {
+      const { data, error } = await supabase
+        .from("purchase_decisions")
+        .select("*")
+        .eq("id", id!)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as PurchaseDecision) ?? null;
+    },
+  });
+}
+
+export function useUpdateDecision() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<Pick<PurchaseDecision, "verdict" | "overridden">>;
+    }) => {
+      const { error } = await supabase.from("purchase_decisions").update(updates).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["purchase_decisions"] });
+      qc.invalidateQueries({ queryKey: ["purchase_decision"] });
+    },
+  });
+}
+
+export function useDeleteDecision() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("purchase_decisions").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["purchase_decisions"] });
+    },
+  });
+}
