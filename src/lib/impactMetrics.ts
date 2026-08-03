@@ -2,6 +2,8 @@ export interface ImpactInput {
   price: number;
   income: number;
   savings: number;
+  /** Optional user-set hourly wage; overrides the income/160 estimate. */
+  hourlyWage?: number | null;
 }
 
 export interface ImpactResult {
@@ -14,10 +16,15 @@ export interface ImpactResult {
 const WORK_HOURS_PER_MONTH = 160;
 const WORK_HOURS_PER_DAY = 8;
 
-export function computeImpact({ price, income, savings }: ImpactInput): ImpactResult {
+export function computeImpact({ price, income, savings, hourlyWage }: ImpactInput): ImpactResult {
   const savingsPct = savings > 0 ? (price / savings) * 100 : null;
   const savingsAfter = savings - price;
-  const hourly = income > 0 ? income / WORK_HOURS_PER_MONTH : 0;
+  const hourly =
+    hourlyWage && hourlyWage > 0
+      ? hourlyWage
+      : income > 0
+        ? income / WORK_HOURS_PER_MONTH
+        : 0;
   const hours = hourly > 0 ? price / hourly : 0;
   const workDays = hours / WORK_HOURS_PER_DAY;
   return { savingsPct, savingsAfter, hours, workDays };

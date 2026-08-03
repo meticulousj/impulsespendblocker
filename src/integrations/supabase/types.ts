@@ -195,6 +195,7 @@ export type Database = {
           archetype: string
           created_at: string
           emergency_fund_target: number | null
+          hourly_wage: number | null
           quiz_completed_at: string
           updated_at: string
           user_id: string
@@ -203,6 +204,7 @@ export type Database = {
           archetype?: string
           created_at?: string
           emergency_fund_target?: number | null
+          hourly_wage?: number | null
           quiz_completed_at?: string
           updated_at?: string
           user_id: string
@@ -211,6 +213,7 @@ export type Database = {
           archetype?: string
           created_at?: string
           emergency_fund_target?: number | null
+          hourly_wage?: number | null
           quiz_completed_at?: string
           updated_at?: string
           user_id?: string
