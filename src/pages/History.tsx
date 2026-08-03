@@ -97,6 +97,12 @@ export default function History() {
             <h1 className="text-xl font-bold tracking-tight">Purchase Dashboard</h1>
             <p className="text-xs text-muted-foreground">Your spending decisions & savings over time</p>
           </div>
+          <Link
+            to="/waits"
+            className="ml-auto rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-accent transition-colors"
+          >
+            On hold →
+          </Link>
         </div>
 
         {isLoading ? (
