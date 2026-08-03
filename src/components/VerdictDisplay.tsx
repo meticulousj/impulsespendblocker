@@ -126,6 +126,16 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
           {verdict}
         </h2>
         <p className="text-muted-foreground mt-1 text-sm">{c.label}</p>
+        {impact && impact.hours > 0 && (
+          <div className="mt-3">
+            <p className={`font-mono text-2xl font-bold ${c.color}`}>
+              {formatHours(impact.hours)} of work
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              that's what this costs you in time{impact.hours >= 8 ? ` — ${formatWorkDays(impact.workDays)}` : ""}
+            </p>
+          </div>
+        )}
         {isAI && (
           <span className="inline-flex items-center gap-1 mt-2 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
             <Sparkles className="w-2.5 h-2.5" />
