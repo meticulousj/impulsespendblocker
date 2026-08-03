@@ -29,6 +29,7 @@ interface VerdictDisplayProps {
   savings?: number;
   linkedGoal?: SavingsGoalWithProgress | null;
   emergencyFundTarget?: number | null;
+  hourlyWage?: number | null;
 }
 
 const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: string; bg: string; ring: string }> = {
@@ -62,14 +63,14 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal, emergencyFundTarget }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal, emergencyFundTarget, hourlyWage }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
 
   const showImpact = typeof price === "number" && price > 0;
   const impact = showImpact
-    ? computeImpact({ price: price!, income: income ?? 0, savings: savings ?? 0 })
+    ? computeImpact({ price: price!, income: income ?? 0, savings: savings ?? 0, hourlyWage })
     : null;
   const driver = impact ? getImpactDriver(verdict, impact, { income: income ?? 0, savings: savings ?? 0 }) : null;
   const driverLabel = verdict === "BUY" ? "Most comfortable" : "Biggest factor";

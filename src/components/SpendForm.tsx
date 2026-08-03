@@ -17,9 +17,10 @@ interface SpendFormProps {
   isLoading: boolean;
   initialItem?: string;
   initialPrice?: string;
+  hourlyWage?: number | null;
 }
 
-export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice }: SpendFormProps) {
+export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hourlyWage }: SpendFormProps) {
   const [item, setItem] = useState(initialItem ?? "");
   const [price, setPrice] = useState(initialPrice ?? "");
   const [income, setIncome] = useState("");
@@ -54,8 +55,8 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice }: Sp
   const priceNum = parseFloat(price);
   const incomeNum = parseFloat(income);
   const liveImpact =
-    priceNum > 0 && incomeNum > 0
-      ? computeImpact({ price: priceNum, income: incomeNum, savings: 0 })
+    priceNum > 0 && (incomeNum > 0 || (hourlyWage ?? 0) > 0)
+      ? computeImpact({ price: priceNum, income: incomeNum || 0, savings: 0, hourlyWage })
       : null;
 
   return (
