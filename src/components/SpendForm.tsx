@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Target } from "lucide-react";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
 import { ReceiptScanner } from "./ReceiptScanner";
+import { computeImpact, formatHours, formatWorkDays } from "@/lib/impactMetrics";
 
 interface SpendFormProps {
   onSubmit: (data: {
@@ -49,6 +50,13 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice }: Sp
 
   const inputClass =
     "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-shadow";
+
+  const priceNum = parseFloat(price);
+  const incomeNum = parseFloat(income);
+  const liveImpact =
+    priceNum > 0 && incomeNum > 0
+      ? computeImpact({ price: priceNum, income: incomeNum, savings: 0 })
+      : null;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
