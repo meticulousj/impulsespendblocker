@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { LogOut, CreditCard, Sparkles, User2, Type, Wand2, Download, Share2, Gavel } from "lucide-react";
+import { LogOut, CreditCard, Sparkles, User2, Type, Wand2, Download, Share2, Gavel, Timer } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile, useSaveHourlyWage } from "@/hooks/useUserProfile";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { PersonalityQuiz } from "@/components/PersonalityQuiz";
@@ -16,6 +16,25 @@ export default function Profile() {
   const { data: profile } = useUserProfile();
   const archetype = profile?.archetype ?? null;
   const [quizOpen, setQuizOpen] = useState(false);
+  const saveWage = useSaveHourlyWage();
+  const [wage, setWage] = useState("");
+
+  useEffect(() => {
+    setWage(profile?.hourly_wage != null ? String(profile.hourly_wage) : "");
+  }, [profile?.hourly_wage]);
+
+  const handleSaveWage = () => {
+    const parsed = wage.trim() === "" ? null : parseFloat(wage);
+    if (parsed !== null && (!isFinite(parsed) || parsed <= 0)) {
+      toast.error("Enter an hourly wage greater than 0");
+      return;
+    }
+    saveWage.mutate(parsed, {
+      onSuccess: () =>
+        toast.success(parsed ? `Time cost now uses $${parsed}/hour` : "Back to estimating from your income"),
+      onError: (err) => toast.error(err instanceof Error ? err.message : "Could not save"),
+    });
+  };
 
   const handleUpgrade = async () => {
     try {
@@ -106,6 +125,41 @@ export default function Profile() {
                 Upgrade to Pro — $5/mo
               </button>
             )}
+          </section>
+
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Time cost
+            </p>
+            <label className="flex items-center gap-2 text-sm">
+              <Timer className="w-4 h-4" />
+              Your hourly wage
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-mono">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={wage}
+                  onChange={(e) => setWage(e.target.value)}
+                  placeholder="28"
+                  className="w-full rounded-xl border border-border bg-background pl-7 pr-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring/40"
+                />
+              </div>
+              <button
+                onClick={handleSaveWage}
+                disabled={saveWage.isPending}
+                className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Used to turn prices into "hours of work". Leave blank to estimate from your monthly income
+              (160 h/month).
+            </p>
           </section>
 
           <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">

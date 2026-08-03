@@ -356,6 +356,7 @@ export default function Index() {
                 isLoading={isLoading}
                 initialItem={prefill?.item}
                 initialPrice={prefill?.price}
+                hourlyWage={profile?.hourly_wage ?? null}
               />
             </div>
 
@@ -396,6 +397,7 @@ export default function Index() {
               savings={formData?.savings}
               linkedGoal={linkedGoal ?? null}
               emergencyFundTarget={profile?.emergency_fund_target ?? null}
+              hourlyWage={profile?.hourly_wage ?? null}
             />
             {(result.verdict === "WAIT" || result.verdict === "SKIP") && formData && (
               <WaitPeriodSuggestion
