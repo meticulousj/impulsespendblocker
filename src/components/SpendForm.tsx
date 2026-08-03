@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Target } from "lucide-react";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
 import { ReceiptScanner } from "./ReceiptScanner";
+import { computeImpact, formatHours, formatWorkDays } from "@/lib/impactMetrics";
 
 interface SpendFormProps {
   onSubmit: (data: {
@@ -49,6 +50,13 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice }: Sp
 
   const inputClass =
     "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-shadow";
+
+  const priceNum = parseFloat(price);
+  const incomeNum = parseFloat(income);
+  const liveImpact =
+    priceNum > 0 && incomeNum > 0
+      ? computeImpact({ price: priceNum, income: incomeNum, savings: 0 })
+      : null;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -106,6 +114,20 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice }: Sp
             />
           </div>
         </div>
+
+        {liveImpact && (
+          <div className="rounded-xl border border-border/60 bg-card/60 px-4 py-3 text-center animate-verdict-enter">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              Real price in your time
+            </p>
+            <p className="mt-1 font-mono text-2xl font-bold text-verdict-wait">
+              {formatHours(liveImpact.hours)} of work
+            </p>
+            {liveImpact.hours >= 8 && (
+              <p className="text-[11px] text-muted-foreground">{formatWorkDays(liveImpact.workDays)}</p>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div>
