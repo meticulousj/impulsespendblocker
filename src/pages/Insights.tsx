@@ -5,6 +5,7 @@ import { usePurchaseHistory } from "@/hooks/usePurchaseHistory";
 import { CategoryBreakdown } from "@/components/CategoryBreakdown";
 import { HourHeatmap } from "@/components/HourHeatmap";
 import { InsightCards } from "@/components/InsightCards";
+import { RecapCard } from "@/components/RecapCard";
 import { useLatestDigest, useRefreshInsights } from "@/hooks/useInsights";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -62,6 +63,7 @@ export default function Insights() {
         refreshing={refresh.isPending}
         generatedAt={digest?.generated_at}
       />
+      <RecapCard decisions={decisions ?? []} />
       <CategoryBreakdown decisions={decisions ?? []} />
       <HourHeatmap decisions={decisions ?? []} />
     </div>
