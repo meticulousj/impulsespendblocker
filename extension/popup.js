@@ -134,3 +134,33 @@ analyzeBtn.addEventListener("click", () => {
 });
 
 run();
+
+// ---- Settings (used by the auto pop-up on shopping pages) ----
+const autoEl = document.getElementById("auto");
+const wageEl = document.getElementById("wage");
+const incomeEl = document.getElementById("income");
+const minEl = document.getElementById("minprice");
+const savedEl = document.getElementById("saved");
+
+chrome.storage.local.get(["autoCheck", "hourlyWage", "monthlyIncome", "minPrice"]).then((s) => {
+  autoEl.checked = s.autoCheck !== false;
+  if (s.hourlyWage) wageEl.value = s.hourlyWage;
+  if (s.monthlyIncome) incomeEl.value = s.monthlyIncome;
+  if (s.minPrice) minEl.value = s.minPrice;
+});
+
+function persist() {
+  chrome.storage.local.set({
+    autoCheck: autoEl.checked,
+    hourlyWage: parseFloat(wageEl.value) || 0,
+    monthlyIncome: parseFloat(incomeEl.value) || 0,
+    minPrice: parseFloat(minEl.value) || 0,
+  });
+  savedEl.textContent = "Saved.";
+  setTimeout(() => (savedEl.textContent = "Saved automatically."), 1200);
+  chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+    if (tab?.id) chrome.tabs.sendMessage(tab.id, { type: "isb-check" }).catch(() => {});
+  });
+}
+
+[autoEl, wageEl, incomeEl, minEl].forEach((el) => el.addEventListener("change", persist));

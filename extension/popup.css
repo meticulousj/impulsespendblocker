@@ -55,3 +55,8 @@ button {
 button:hover { background: #166534; }
 button:disabled { background: #9ca3af; cursor: not-allowed; }
 .hint { font-size: 11px; color: #9ca3af; margin: 10px 0 0; text-align: center; }
+.settings { margin-top: 18px; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+.settings .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.settings label.inline { margin: 0; text-transform: none; font-size: 12px; letter-spacing: 0; color: #0f1a12; }
+.settings .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.settings input.switch { width: auto; }

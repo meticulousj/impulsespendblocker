@@ -235,7 +235,9 @@ export default function Profile() {
               <span className="text-muted-foreground">.zip →</span>
             </button>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Scan prices on Amazon, Shopify stores, eBay, Etsy, Target, Best Buy & Walmart.
+              Pops up automatically on product, cart & checkout pages at Amazon, Shopify stores,
+              eBay, Etsy, Target, Best Buy & Walmart — with price, hours of work and a
+              BUY / WAIT / SKIP verdict. Set your wage and income in the extension popup.
               Unzip → chrome://extensions → Load unpacked.
             </p>
             <div className="flex items-center gap-2 rounded-xl bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
