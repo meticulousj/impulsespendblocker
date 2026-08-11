@@ -7,7 +7,8 @@ import { AuthForm } from "@/components/AuthForm";
 import { ProBadge } from "@/components/ProBadge";
 import { analyzeSpend } from "@/lib/spendAnalyzer";
 import { useAuth } from "@/hooks/useAuth";
-import { useSaveDecision } from "@/hooks/usePurchaseHistory";
+import { useSaveDecision, usePurchaseHistory } from "@/hooks/usePurchaseHistory";
+import { RecapBanner } from "@/components/RecapBanner";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { PersonalityQuiz } from "@/components/PersonalityQuiz";
 import { TextSizeToggle } from "@/components/TextSizeToggle";
@@ -55,6 +56,7 @@ export default function Index() {
   const archetype = profile?.archetype ?? null;
   const [quizOpen, setQuizOpen] = useState(false);
   const { data: goals } = useSavingsGoals();
+  const { data: history } = usePurchaseHistory();
   const { data: customRules } = useCustomRules();
   const linkedGoal = formData?.goal_id ? goals?.find((g) => g.id === formData.goal_id) ?? null : null;
   const activeGoal = goals?.find((g) => g.is_active) ?? null;
@@ -339,6 +341,7 @@ export default function Index() {
         {/* Form or Result */}
         {!result ? (
           <div className="space-y-4">
+            {user && <RecapBanner decisions={history ?? []} />}
             {activeGoal && (
               <Link
                 to="/goals"
