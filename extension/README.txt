@@ -7,7 +7,11 @@ Install (Chrome, Edge, Brave, Arc, Opera):
 4. Click "Load unpacked" and select the unzipped folder.
 5. Pin the Impulse Spend Blocker icon to your toolbar.
 
-Use it:
-- Open any Amazon, Shopify store, eBay, Etsy, Target, Best Buy, or Walmart product page.
-- Click the icon. The item name and price are auto-filled.
-- Hit "Analyze in Impulse Blocker" to open your dashboard with a BUY / WAIT / SKIP verdict.
+Automatic checks:
+- On Amazon, Shopify stores, eBay, Etsy, Target, Best Buy and Walmart product,
+  cart and checkout pages, a small card pops up on its own with the price,
+  the hours of work it costs you, and a BUY / WAIT / SKIP verdict.
+- Set your hourly wage, monthly income and a minimum price in the extension
+  popup so the verdict matches your finances. You can turn the auto pop-up off
+  there too.
+- "Analyze in app" opens your dashboard with the item and price prefilled.
