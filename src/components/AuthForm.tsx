@@ -24,13 +24,12 @@ export function AuthForm() {
     }
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-shadow";
+  const inputClass = "field-input";
 
   return (
-    <div className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-4">
+    <div className="bento-tile p-6 space-y-5">
       <div className="text-center">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-bold">
           {isSignUp ? "Create an account" : "Sign in"}
         </h2>
         <p className="text-xs text-muted-foreground mt-1">
@@ -61,7 +60,7 @@ export function AuthForm() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full h-11 rounded-xl text-sm font-semibold active:scale-[0.98] transition-transform"
+          className="w-full h-12 rounded-xl bg-gradient-ink text-sm font-semibold shadow-lift transition-all duration-200 hover:opacity-95 active:scale-[0.98]"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 animate-spin" />

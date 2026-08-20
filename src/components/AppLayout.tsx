@@ -13,14 +13,14 @@ const tabs = [
 export default function AppLayout() {
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 pb-24">
+      <main className="flex-1 pb-32">
         <Outlet />
       </main>
       <nav
         aria-label="Primary"
-        className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+        className="fixed bottom-4 inset-x-0 z-40 px-4"
       >
-        <ul className="mx-auto flex max-w-md items-stretch justify-between px-2 py-2 safe-area-inset-bottom">
+        <ul className="mx-auto flex max-w-md items-stretch justify-between gap-1 rounded-3xl border border-border/70 bg-card/80 p-1.5 shadow-lift backdrop-blur-xl">
           {tabs.map(({ to, label, icon: Icon, end }) => (
             <li key={to} className="flex-1">
               <NavLink
@@ -28,10 +28,10 @@ export default function AppLayout() {
                 end={end}
                 className={({ isActive }) =>
                   cn(
-                    "flex flex-col items-center gap-0.5 rounded-lg py-1.5 text-[10px] font-medium transition-colors active:scale-[0.96]",
+                    "flex flex-col items-center gap-1 rounded-2xl py-2 text-[10px] font-semibold tracking-tight transition-all duration-200 active:scale-[0.96]",
                     isActive
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground",
+                      ? "bg-accent text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )
                 }
               >
@@ -39,9 +39,10 @@ export default function AppLayout() {
                   <>
                     <Icon
                       className={cn(
-                        "h-5 w-5 transition-transform",
-                        isActive && "scale-110",
+                        "h-[18px] w-[18px] transition-transform duration-200",
+                        isActive ? "scale-110" : "",
                       )}
+                      strokeWidth={isActive ? 2.4 : 1.9}
                     />
                     <span>{label}</span>
                   </>
