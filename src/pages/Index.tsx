@@ -250,23 +250,24 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen px-4 py-10 sm:py-14">
+      <div className="mx-auto w-full max-w-md space-y-5 animate-fade-up lg:max-w-5xl">
         {/* Header */}
-        <div className="text-center space-y-3">
+        <header className="text-center space-y-3 lg:text-left">
           <img
             src={logoAsset.url}
             alt="Impulse Spend Blocker logo"
-            className="mx-auto h-20 w-auto"
+            className="mx-auto h-16 w-auto lg:mx-0"
           />
-          <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
-            Before you swipe, let the numbers decide. Enter what you want to buy and your financial snapshot.
+          <h1 className="sr-only">Impulse Spend Blocker</h1>
+          <p className="mx-auto max-w-xs text-sm leading-relaxed text-muted-foreground lg:mx-0 lg:max-w-sm">
+            Before you swipe, let the numbers decide.
           </p>
-        </div>
+        </header>
 
         {/* Auth bar */}
         {!authLoading && (
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-border/70 bg-card/70 px-4 py-2.5 shadow-xs backdrop-blur lg:justify-start">
             <TextSizeToggle />
             <span className="text-border">·</span>
             {user ? (
@@ -308,13 +309,15 @@ export default function Index() {
           </div>
         )}
 
+        <div className="grid gap-5 lg:grid-cols-5 lg:items-start">
+        <div className="space-y-5 lg:col-span-3">
         {/* AI toggle for Pro users */}
         {user && isPro && !result && (
           <div
-            className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
+            className={`flex items-center justify-between rounded-2xl border p-3.5 transition-colors ${
               useAI
-                ? "border-primary/30 bg-primary/5"
-                : "border-border bg-card"
+                ? "border-primary/30 bg-accent"
+                : "border-border bg-card shadow-xs"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -325,12 +328,13 @@ export default function Index() {
             </div>
             <button
               onClick={() => setUseAI(!useAI)}
+              aria-label="Toggle AI analysis"
               className={`relative w-9 h-5 rounded-full transition-colors ${
                 useAI ? "bg-primary" : "bg-muted"
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-card shadow transition-transform ${
                   useAI ? "translate-x-4" : "translate-x-0"
                 }`}
               />
@@ -340,20 +344,18 @@ export default function Index() {
 
         {/* Form or Result */}
         {!result ? (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {user && <RecapBanner decisions={history ?? []} />}
             {activeGoal && (
               <Link
                 to="/goals"
-                className="block rounded-2xl border border-verdict-buy/30 bg-verdict-buy/5 p-4 hover:bg-verdict-buy/10 transition-colors"
+                className="bento-tile bento-tile-hover block border-verdict-buy/25 bg-accent"
               >
-                <p className="text-[10px] font-bold uppercase tracking-wider text-verdict-buy mb-2">
-                  Active goal
-                </p>
+                <p className="eyebrow mb-2 text-verdict-buy">Active goal</p>
                 <GoalProgressBar goal={activeGoal} compact />
               </Link>
             )}
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+            <div className="bento-tile p-6 sm:p-7">
               <SpendForm
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -367,10 +369,17 @@ export default function Index() {
             {user && !isPro && (
               <button
                 onClick={handleUpgrade}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-xs font-medium text-primary hover:bg-primary/10 transition-colors active:scale-[0.98]"
+                className="group flex w-full items-center justify-between gap-3 rounded-2xl bg-gradient-primary px-5 py-4 text-left text-primary-foreground shadow-glow transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                Upgrade to Pro — AI-powered verdicts for $5/mo
+                <span>
+                  <span className="block text-[10px] font-bold uppercase tracking-[0.16em] opacity-80">
+                    Pro
+                  </span>
+                  <span className="block text-sm font-semibold">
+                    AI-powered verdicts — $5/mo
+                  </span>
+                </span>
+                <Sparkles className="h-5 w-5 shrink-0 transition-transform group-hover:rotate-12" />
               </button>
             )}
 
@@ -379,10 +388,17 @@ export default function Index() {
                 <AuthForm />
                 <button
                   onClick={handleUpgrade}
-                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-xs font-medium text-primary hover:bg-primary/10 transition-colors active:scale-[0.98]"
+                  className="group flex w-full items-center justify-between gap-3 rounded-2xl bg-gradient-primary px-5 py-4 text-left text-primary-foreground shadow-glow transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Upgrade to Pro — AI-powered verdicts for $5/mo
+                  <span>
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.16em] opacity-80">
+                      Pro
+                    </span>
+                    <span className="block text-sm font-semibold">
+                      AI-powered verdicts — $5/mo
+                    </span>
+                  </span>
+                  <Sparkles className="h-5 w-5 shrink-0 transition-transform group-hover:rotate-12" />
                 </button>
               </>
             )}
@@ -412,15 +428,53 @@ export default function Index() {
             )}
             <button
               onClick={handleReset}
-              className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2 active:scale-[0.98]"
+              className="w-full rounded-xl py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.98]"
             >
               ← Analyze another purchase
             </button>
           </div>
         )}
+        </div>
+
+        {/* Side bento column */}
+        <aside className="hidden space-y-5 lg:col-span-2 lg:block">
+          <div className="bento-tile bg-gradient-ink p-6 text-primary-foreground">
+            <p className="eyebrow text-primary-foreground/60">The idea</p>
+            <p className="mt-3 font-display text-2xl font-bold leading-snug tracking-tight">
+              Every purchase is priced in hours of your life.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-primary-foreground/70">
+              We turn the price tag into time, savings impact, and what you'd have instead — then call it: BUY, WAIT or SKIP.
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "Buy", tone: "text-verdict-buy", bg: "bg-verdict-buy/10" },
+              { label: "Wait", tone: "text-verdict-wait", bg: "bg-verdict-wait/10" },
+              { label: "Skip", tone: "text-verdict-skip", bg: "bg-verdict-skip/10" },
+            ].map((v) => (
+              <div
+                key={v.label}
+                className={`rounded-2xl border border-border/60 ${v.bg} px-3 py-4 text-center`}
+              >
+                <span className={`font-display text-sm font-bold uppercase tracking-wide ${v.tone}`}>
+                  {v.label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <Link
+            to="/insights"
+            className="bento-tile bento-tile-hover flex items-center justify-between"
+          >
+            <span className="text-sm font-semibold">See your spending patterns</span>
+            <Target className="h-4 w-4 text-primary" />
+          </Link>
+        </aside>
+        </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground/60">
+        <p className="text-center text-xs text-muted-foreground/70">
           {user
             ? "Your decisions are saved securely to your account."
             : "Your data stays on your device. Nothing is stored or sent anywhere."}
