@@ -49,8 +49,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
     });
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-shadow";
+  const inputClass = "field-input";
 
   const priceNum = parseFloat(price);
   const incomeNum = parseFloat(income);
@@ -69,7 +68,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
       />
       <div className="space-y-4">
         <div>
-          <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+          <label className="eyebrow mb-2 block">
             What do you want to buy?
           </label>
           <input
@@ -85,7 +84,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+            <label className="eyebrow mb-2 block">
               Price ($)
             </label>
             <input
@@ -100,7 +99,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
             />
           </div>
           <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+            <label className="eyebrow mb-2 block">
               Monthly income ($)
             </label>
             <input
@@ -117,11 +116,11 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
         </div>
 
         {liveImpact && (
-          <div className="rounded-xl border border-border/60 bg-card/60 px-4 py-3 text-center animate-verdict-enter">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <div className="rounded-2xl border border-verdict-wait/25 bg-verdict-wait/[0.07] px-4 py-4 text-center animate-verdict-enter">
+            <p className="eyebrow text-verdict-wait/80">
               Real price in your time
             </p>
-            <p className="mt-1 font-mono text-2xl font-bold text-verdict-wait">
+            <p className="mt-1.5 font-mono text-3xl font-extrabold tracking-tight text-verdict-wait">
               {formatHours(liveImpact.hours)} of work
             </p>
             {liveImpact.hours >= 8 && (
@@ -132,7 +131,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+            <label className="eyebrow mb-2 block">
               Savings ($)
             </label>
             <input
@@ -146,7 +145,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
             />
           </div>
           <div>
-            <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+            <label className="eyebrow mb-2 block">
               Financial goal
             </label>
             {goals && goals.length > 0 ? (
@@ -182,7 +181,7 @@ export function SpendForm({ onSubmit, isLoading, initialItem, initialPrice, hour
       <Button
         type="submit"
         disabled={isLoading || !item.trim() || !price || !income}
-        className="w-full h-12 rounded-xl text-sm font-semibold tracking-wide active:scale-[0.98] transition-transform"
+        className="w-full h-14 rounded-2xl bg-gradient-ink text-[15px] font-semibold tracking-tight shadow-lift transition-all duration-200 hover:opacity-95 active:scale-[0.98] disabled:shadow-none"
       >
         {isLoading ? (
           <>
