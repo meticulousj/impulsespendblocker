@@ -6,6 +6,7 @@ import { CategoryBreakdown } from "@/components/CategoryBreakdown";
 import { HourHeatmap } from "@/components/HourHeatmap";
 import { InsightCards } from "@/components/InsightCards";
 import { RecapCard } from "@/components/RecapCard";
+import { PageHeader } from "@/components/PageHeader";
 import { useLatestDigest, useRefreshInsights } from "@/hooks/useInsights";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -28,14 +29,16 @@ export default function Insights() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-md w-full text-center space-y-3">
-          <Lock className="w-8 h-8 mx-auto text-muted-foreground" />
-          <h1 className="text-lg font-semibold">Sign in to view insights</h1>
-          <p className="text-sm text-muted-foreground">
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="bento-tile w-full max-w-sm space-y-3 p-8 text-center">
+          <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-primary">
+            <Lock className="h-5 w-5" />
+          </div>
+          <h1 className="font-display text-lg font-bold">Sign in to view insights</h1>
+          <p className="text-sm leading-relaxed text-muted-foreground">
             Insights unlock after you save a few purchase decisions.
           </p>
-          <Link to="/" className="inline-block text-sm text-primary hover:underline">
+          <Link to="/" className="inline-block text-sm font-semibold text-primary hover:underline">
             Go home →
           </Link>
         </div>
@@ -44,16 +47,13 @@ export default function Insights() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8 space-y-6">
-      <header className="space-y-1">
-        <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-          <Sparkles className="w-3 h-3" /> Insights
-        </div>
-        <h1 className="text-2xl font-display font-semibold">Your spending patterns</h1>
-        <p className="text-sm text-muted-foreground">
-          Trends across categories, times, and impulse triggers.
-        </p>
-      </header>
+    <div className="mx-auto max-w-2xl space-y-6 px-4 py-10">
+      <PageHeader
+        eyebrow="Insights"
+        icon={Sparkles}
+        title="Your spending patterns"
+        description="Trends across categories, times, and impulse triggers."
+      />
 
       <InsightCards
         insights={digest?.insights ?? []}
@@ -64,8 +64,10 @@ export default function Insights() {
         generatedAt={digest?.generated_at}
       />
       <RecapCard decisions={decisions ?? []} />
-      <CategoryBreakdown decisions={decisions ?? []} />
-      <HourHeatmap decisions={decisions ?? []} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <CategoryBreakdown decisions={decisions ?? []} />
+        <HourHeatmap decisions={decisions ?? []} />
+      </div>
     </div>
   );
 }
