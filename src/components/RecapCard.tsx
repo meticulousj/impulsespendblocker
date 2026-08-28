@@ -16,16 +16,16 @@ export function RecapCard({ decisions }: Props) {
   const recap = useMemo(() => buildRecap(decisions, period), [decisions, period]);
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+    <section className="bento-tile space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+          <p className="eyebrow inline-flex items-center gap-1.5 text-primary">
             <CalendarCheck className="w-3 h-3" /> Recap
           </p>
-          <h2 className="text-base font-display font-semibold">What you almost bought</h2>
+          <h2 className="font-display text-base font-bold">What you almost bought</h2>
           <p className="text-xs text-muted-foreground">{recap.label}</p>
         </div>
-        <div className="flex rounded-xl border border-border p-0.5 text-xs">
+        <div className="flex rounded-2xl bg-[hsl(var(--surface-sunken))] p-0.5 text-xs">
           {(["week", "month"] as RecapPeriod[]).map((p) => (
             <button
               key={p}

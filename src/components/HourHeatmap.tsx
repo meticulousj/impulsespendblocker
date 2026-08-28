@@ -17,9 +17,9 @@ export function HourHeatmap({ decisions }: { decisions: PurchaseDecision[] }) {
   const peakHour = buckets.indexOf(max);
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+    <div className="bento-tile space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold">When you shop</p>
+        <p className="font-display text-sm font-bold">When you shop</p>
         {max > 0 && (
           <p className="text-xs text-muted-foreground">
             Peak: <span className="font-mono text-foreground">{formatHour(peakHour)}</span>

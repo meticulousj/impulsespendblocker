@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Target, Trash2, Pencil, Star, StarOff, ShieldCheck } from "lucide-react";
+import { Plus, Target, Trash2, Pencil, Star, StarOff, ShieldCheck } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
 import {
   useSavingsGoals,
   useCreateGoal,
@@ -37,8 +38,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-const inputClass =
-  "w-full rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-shadow";
+const inputClass = "field-input";
 
 function GoalDialog({
   trigger,
@@ -173,8 +173,8 @@ function GoalCard({ goal }: { goal: SavingsGoalWithProgress }) {
 
   return (
     <div
-      className={`rounded-2xl border p-5 space-y-4 transition-colors ${
-        goal.is_active ? "border-verdict-buy/40 bg-verdict-buy/5" : "border-border bg-card"
+      className={`bento-tile bento-tile-hover space-y-4 ${
+        goal.is_active ? "border-verdict-buy/30 bg-accent" : ""
       }`}
     >
       <GoalProgressBar goal={goal} />
@@ -253,10 +253,10 @@ function EmergencyFundCard() {
   const shown = value ?? (current !== null ? String(current) : "");
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+    <div className="bento-tile space-y-3">
       <div className="flex items-center gap-2">
         <ShieldCheck className="w-4 h-4 text-primary" />
-        <h2 className="text-sm font-semibold">Emergency fund target</h2>
+        <h2 className="font-display text-sm font-bold">Emergency fund target</h2>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">
         Used in the "If you don't buy this…" panel to show how close each skip gets you to a full safety net.
@@ -306,45 +306,35 @@ export default function Goals() {
   return (
     <div className="min-h-screen px-4 py-10">
       <div className="w-full max-w-md mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Back
-          </Link>
-          <GoalDialog
-            title="New savings goal"
-            onSubmit={async (v) => {
-              await create.mutateAsync(v);
-              toast.success(`"${v.name}" created`);
-            }}
-            trigger={
-              <Button size="sm" className="rounded-xl">
-                <Plus className="w-4 h-4" />
-                New goal
-              </Button>
-            }
-          />
-        </div>
-
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-verdict-buy/10 text-verdict-buy">
-            <Target className="w-6 h-6" strokeWidth={2} />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">Savings goals</h1>
-          <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
-            Every SKIP you honor stacks toward what you actually want.
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Goals"
+          icon={Target}
+          title="Savings goals"
+          description="Every SKIP you honor stacks toward what you actually want."
+          backTo="/"
+          action={
+            <GoalDialog
+              title="New savings goal"
+              onSubmit={async (v) => {
+                await create.mutateAsync(v);
+                toast.success(`"${v.name}" created`);
+              }}
+              trigger={
+                <Button size="sm" className="rounded-2xl shadow-[var(--shadow-glow)]">
+                  <Plus className="w-4 h-4" />
+                  New
+                </Button>
+              }
+            />
+          }
+        />
 
         <EmergencyFundCard />
 
         {isLoading ? (
           <p className="text-center text-sm text-muted-foreground">Loading…</p>
         ) : !goals || goals.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border p-8 text-center space-y-3">
+          <div className="rounded-3xl border border-dashed border-border p-10 text-center space-y-3">
             <p className="text-sm text-muted-foreground">
               No goals yet. Add your first — a trip, an emergency fund, anything.
             </p>
