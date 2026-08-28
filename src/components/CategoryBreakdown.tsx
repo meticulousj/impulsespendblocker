@@ -25,9 +25,9 @@ export function CategoryBreakdown({ decisions }: { decisions: PurchaseDecision[]
   const max = Math.max(...stats.map((s) => s.total), 1);
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+    <div className="bento-tile space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold">Spending by category</p>
+        <p className="font-display text-sm font-bold">Spending by category</p>
         <p className="text-xs text-muted-foreground">{stats.length} categories</p>
       </div>
       <div className="space-y-2">
