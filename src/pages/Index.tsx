@@ -178,23 +178,27 @@ export default function Index() {
 
         setResult(analysis);
 
-        // Save if logged in
+        const contributed = computeContribution(analysis.verdict, false, data.price);
+        const record = {
+          item: data.item,
+          price: data.price,
+          income: data.income,
+          savings: data.savings,
+          goal: data.goal,
+          verdict: analysis.verdict,
+          overridden: false,
+          reason: analysis.reason,
+          tip: analysis.tip,
+          category,
+          goal_id: data.goal_id,
+          contributed_amount: contributed,
+        };
+
         if (user) {
-          const contributed = computeContribution(analysis.verdict, false, data.price);
-          saveDecision.mutate({
-            item: data.item,
-            price: data.price,
-            income: data.income,
-            savings: data.savings,
-            goal: data.goal,
-            verdict: analysis.verdict,
-            overridden: false,
-            reason: analysis.reason,
-            tip: analysis.tip,
-            category,
-            goal_id: data.goal_id,
-            contributed_amount: contributed,
-          });
+          saveDecision.mutate(record);
+        } else {
+          // Guests get the verdict first; the decision is saved once they sign up.
+          savePendingDecision(record);
         }
       } catch (err) {
         console.error(err);
