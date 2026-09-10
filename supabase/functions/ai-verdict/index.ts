@@ -1,9 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const TRIAL_LIMIT = 3;
+const PRO_PRODUCT_ID = "prod_UBaQHnzH7vAT4E";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -14,6 +19,67 @@ serve(async (req) => {
     const { item, price, income, savings, goal, archetype } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // --- Auth + free-trial gating -------------------------------------------
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Sign in to use AI verdicts." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: userData, error: userError } = await admin.auth.getUser(
+      authHeader.replace("Bearer ", "")
+    );
+    const user = userData?.user;
+    if (userError || !user?.email) {
+      return new Response(JSON.stringify({ error: "Sign in to use AI verdicts." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { count } = await admin
+      .from("ai_trial_usage")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    const used = count ?? 0;
+
+    let isPro = false;
+    if (used >= TRIAL_LIMIT) {
+      const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+      if (stripeKey) {
+        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+        const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+        if (customers.data.length > 0) {
+          const subs = await stripe.subscriptions.list({
+            customer: customers.data[0].id,
+            status: "active",
+            limit: 5,
+          });
+          isPro = subs.data.some((s) =>
+            s.items.data.some((i) => (i.price.product as string) === PRO_PRODUCT_ID)
+          );
+        }
+      }
+      if (!isPro) {
+        return new Response(
+          JSON.stringify({
+            error: "You've used your 3 free AI verdicts. Upgrade to Pro for unlimited.",
+            trial_exhausted: true,
+            trial_used: used,
+            trial_limit: TRIAL_LIMIT,
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     const priceToIncomeRatio = ((price / income) * 100).toFixed(1);
     const savingsAfterPurchase = savings - price;
@@ -105,9 +171,24 @@ Should they buy this?`;
       throw new Error("Invalid verdict from AI");
     }
 
-    return new Response(JSON.stringify(parsed), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    let trialUsed = used;
+    if (!isPro) {
+      const { error: usageError } = await admin
+        .from("ai_trial_usage")
+        .insert({ user_id: user.id });
+      if (usageError) console.error("trial usage insert failed:", usageError);
+      else trialUsed = used + 1;
+    }
+
+    return new Response(
+      JSON.stringify({
+        ...parsed,
+        trial_used: trialUsed,
+        trial_limit: TRIAL_LIMIT,
+        trial_remaining: isPro ? null : Math.max(0, TRIAL_LIMIT - trialUsed),
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (e) {
     console.error("ai-verdict error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {

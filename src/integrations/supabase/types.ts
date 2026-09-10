@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_trial_usage: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       custom_rules: {
         Row: {
           category: string | null
