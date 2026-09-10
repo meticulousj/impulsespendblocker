@@ -456,6 +456,19 @@ export default function Index() {
                 archetype={archetype}
               />
             )}
+            {!user && !authLoading && (
+              <div className="space-y-3 rounded-3xl border border-primary/25 bg-accent p-4">
+                <div>
+                  <p className="eyebrow text-primary">Keep this decision</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    Create a free account and this verdict for{" "}
+                    <span className="font-semibold text-foreground">{formData?.item}</span> is saved
+                    to your history — along with everything you don't buy from here on.
+                  </p>
+                </div>
+                <AuthForm />
+              </div>
+            )}
             <button
               onClick={handleReset}
               className="w-full rounded-xl py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-[0.98]"
