@@ -211,27 +211,48 @@ export default function Index() {
   );
 
   const handleOverride = useCallback(() => {
-    if (user && formData && result) {
-      saveDecision.mutate({
-        item: formData.item,
-        price: formData.price,
-        income: formData.income,
-        savings: formData.savings,
-        goal: formData.goal,
-        verdict: result.verdict,
-        overridden: true,
-        reason: result.reason,
-        tip: result.tip,
-        category: result.category ?? classifyCategory(formData.item),
-        goal_id: formData.goal_id,
-        contributed_amount: 0,
-      });
+    if (!formData || !result) return;
+    const record = {
+      item: formData.item,
+      price: formData.price,
+      income: formData.income,
+      savings: formData.savings,
+      goal: formData.goal,
+      verdict: result.verdict,
+      overridden: true,
+      reason: result.reason,
+      tip: result.tip,
+      category: result.category ?? classifyCategory(formData.item),
+      goal_id: formData.goal_id,
+      contributed_amount: 0,
+    };
+    if (user) {
+      saveDecision.mutate(record);
+    } else {
+      savePendingDecision(record);
     }
   }, [user, formData, result, saveDecision]);
+
+  // Once a guest signs up/in, save the verdict they already saw.
+  const [savedPending, setSavedPending] = useState(false);
+  useEffect(() => {
+    if (!user || savedPending) return;
+    const pending = readPendingDecision();
+    if (!pending) return;
+    setSavedPending(true);
+    saveDecision.mutate(pending as never, {
+      onSuccess: () => {
+        clearPendingDecision();
+        toast.success("Saved to your history.");
+      },
+      onError: () => setSavedPending(false),
+    });
+  }, [user, savedPending, saveDecision]);
 
   const handleReset = () => {
     setResult(null);
     setFormData(null);
+    clearPendingDecision();
   };
 
   const handleUpgrade = async () => {
