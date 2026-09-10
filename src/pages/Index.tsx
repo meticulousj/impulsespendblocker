@@ -23,6 +23,11 @@ import { computeContribution } from "@/lib/goalContribution";
 import { useCustomRules } from "@/hooks/useCustomRules";
 import { findMatchingRule, describeRule } from "@/lib/customRules";
 import { toast } from "sonner";
+import {
+  savePendingDecision,
+  readPendingDecision,
+  clearPendingDecision,
+} from "@/lib/pendingDecision";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
 
@@ -173,23 +178,27 @@ export default function Index() {
 
         setResult(analysis);
 
-        // Save if logged in
+        const contributed = computeContribution(analysis.verdict, false, data.price);
+        const record = {
+          item: data.item,
+          price: data.price,
+          income: data.income,
+          savings: data.savings,
+          goal: data.goal,
+          verdict: analysis.verdict,
+          overridden: false,
+          reason: analysis.reason,
+          tip: analysis.tip,
+          category,
+          goal_id: data.goal_id,
+          contributed_amount: contributed,
+        };
+
         if (user) {
-          const contributed = computeContribution(analysis.verdict, false, data.price);
-          saveDecision.mutate({
-            item: data.item,
-            price: data.price,
-            income: data.income,
-            savings: data.savings,
-            goal: data.goal,
-            verdict: analysis.verdict,
-            overridden: false,
-            reason: analysis.reason,
-            tip: analysis.tip,
-            category,
-            goal_id: data.goal_id,
-            contributed_amount: contributed,
-          });
+          saveDecision.mutate(record);
+        } else {
+          // Guests get the verdict first; the decision is saved once they sign up.
+          savePendingDecision(record);
         }
       } catch (err) {
         console.error(err);
@@ -202,27 +211,48 @@ export default function Index() {
   );
 
   const handleOverride = useCallback(() => {
-    if (user && formData && result) {
-      saveDecision.mutate({
-        item: formData.item,
-        price: formData.price,
-        income: formData.income,
-        savings: formData.savings,
-        goal: formData.goal,
-        verdict: result.verdict,
-        overridden: true,
-        reason: result.reason,
-        tip: result.tip,
-        category: result.category ?? classifyCategory(formData.item),
-        goal_id: formData.goal_id,
-        contributed_amount: 0,
-      });
+    if (!formData || !result) return;
+    const record = {
+      item: formData.item,
+      price: formData.price,
+      income: formData.income,
+      savings: formData.savings,
+      goal: formData.goal,
+      verdict: result.verdict,
+      overridden: true,
+      reason: result.reason,
+      tip: result.tip,
+      category: result.category ?? classifyCategory(formData.item),
+      goal_id: formData.goal_id,
+      contributed_amount: 0,
+    };
+    if (user) {
+      saveDecision.mutate(record);
+    } else {
+      savePendingDecision(record);
     }
   }, [user, formData, result, saveDecision]);
+
+  // Once a guest signs up/in, save the verdict they already saw.
+  const [savedPending, setSavedPending] = useState(false);
+  useEffect(() => {
+    if (!user || savedPending) return;
+    const pending = readPendingDecision();
+    if (!pending) return;
+    setSavedPending(true);
+    saveDecision.mutate(pending as never, {
+      onSuccess: () => {
+        clearPendingDecision();
+        toast.success("Saved to your history.");
+      },
+      onError: () => setSavedPending(false),
+    });
+  }, [user, savedPending, saveDecision]);
 
   const handleReset = () => {
     setResult(null);
     setFormData(null);
+    clearPendingDecision();
   };
 
   const handleUpgrade = async () => {
@@ -425,6 +455,19 @@ export default function Index() {
                 verdict={result.verdict}
                 archetype={archetype}
               />
+            )}
+            {!user && !authLoading && (
+              <div className="space-y-3 rounded-3xl border border-primary/25 bg-accent p-4">
+                <div>
+                  <p className="eyebrow text-primary">Keep this decision</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    Create a free account and this verdict for{" "}
+                    <span className="font-semibold text-foreground">{formData?.item}</span> is saved
+                    to your history — along with everything you don't buy from here on.
+                  </p>
+                </div>
+                <AuthForm />
+              </div>
             )}
             <button
               onClick={handleReset}
