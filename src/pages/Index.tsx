@@ -23,6 +23,11 @@ import { computeContribution } from "@/lib/goalContribution";
 import { useCustomRules } from "@/hooks/useCustomRules";
 import { findMatchingRule, describeRule } from "@/lib/customRules";
 import { toast } from "sonner";
+import {
+  savePendingDecision,
+  readPendingDecision,
+  clearPendingDecision,
+} from "@/lib/pendingDecision";
 
 type Verdict = "BUY" | "WAIT" | "SKIP";
 
