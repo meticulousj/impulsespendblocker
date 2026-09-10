@@ -171,9 +171,24 @@ Should they buy this?`;
       throw new Error("Invalid verdict from AI");
     }
 
-    return new Response(JSON.stringify(parsed), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    let trialUsed = used;
+    if (!isPro) {
+      const { error: usageError } = await admin
+        .from("ai_trial_usage")
+        .insert({ user_id: user.id });
+      if (usageError) console.error("trial usage insert failed:", usageError);
+      else trialUsed = used + 1;
+    }
+
+    return new Response(
+      JSON.stringify({
+        ...parsed,
+        trial_used: trialUsed,
+        trial_limit: TRIAL_LIMIT,
+        trial_remaining: isPro ? null : Math.max(0, TRIAL_LIMIT - trialUsed),
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (e) {
     console.error("ai-verdict error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
