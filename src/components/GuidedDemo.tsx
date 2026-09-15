@@ -49,7 +49,6 @@ export function GuidedDemo({ onExit, hourlyWage }: GuidedDemoProps) {
         income: DEMO.income,
         savings: DEMO.savings,
         goal: DEMO.goal,
-        goal_id: null,
       }),
     []
   );
