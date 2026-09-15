@@ -387,15 +387,33 @@ export default function Index() {
                 <GoalProgressBar goal={activeGoal} compact />
               </Link>
             )}
-            <div className="bento-tile p-6 sm:p-7">
-              <SpendForm
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-                initialItem={prefill?.item}
-                initialPrice={prefill?.price}
+            {demoOpen ? (
+              <GuidedDemo
+                onExit={() => setDemoOpen(false)}
                 hourlyWage={profile?.hourly_wage ?? null}
               />
-            </div>
+            ) : (
+              <>
+                {!user && (
+                  <button
+                    onClick={() => setDemoOpen(true)}
+                    className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-border/70 bg-card/70 px-4 py-3 text-sm font-medium text-muted-foreground shadow-xs backdrop-blur transition-colors hover:text-foreground active:scale-[0.98]"
+                  >
+                    <Play className="h-4 w-4 text-primary transition-transform group-hover:scale-110" />
+                    New here? Watch the 30-second guided demo
+                  </button>
+                )}
+                <div className="bento-tile p-6 sm:p-7">
+                  <SpendForm
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    initialItem={prefill?.item}
+                    initialPrice={prefill?.price}
+                    hourlyWage={profile?.hourly_wage ?? null}
+                  />
+                </div>
+              </>
+            )}
 
             {/* Upgrade CTA for non-pro users */}
             {user && !isPro && (
