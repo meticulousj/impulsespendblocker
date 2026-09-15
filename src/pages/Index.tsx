@@ -15,7 +15,8 @@ import { TextSizeToggle } from "@/components/TextSizeToggle";
 import { ARCHETYPES } from "@/lib/archetypeConfig";
 import { classifyCategory, isValidCategory } from "@/lib/categoryClassifier";
 import { supabase } from "@/integrations/supabase/client";
-import { History, LogOut, Sparkles, Settings, Target } from "lucide-react";
+import { History, LogOut, Sparkles, Settings, Target, Play } from "lucide-react";
+import { GuidedDemo } from "@/components/GuidedDemo";
 import { WaitPeriodSuggestion } from "@/components/WaitPeriodSuggestion";
 import { GoalProgressBar } from "@/components/GoalProgressBar";
 import { useSavingsGoals } from "@/hooks/useSavingsGoals";
@@ -55,6 +56,7 @@ export default function Index() {
   const [formData, setFormData] = useState<FormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [useAI, setUseAI] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
   const saveDecision = useSaveDecision();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: profile, isLoading: profileLoading } = useUserProfile();
