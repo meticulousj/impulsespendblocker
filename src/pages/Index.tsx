@@ -56,6 +56,7 @@ export default function Index() {
   const [formData, setFormData] = useState<FormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [useAI, setUseAI] = useState(false);
+  const [trialRemaining, setTrialRemaining] = useState<number | null>(null);
   const [demoOpen, setDemoOpen] = useState(false);
   const saveDecision = useSaveDecision();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -131,6 +132,23 @@ export default function Index() {
     if (isPro) setUseAI(true);
   }, [isPro]);
 
+  // Track free AI trial usage (3 verdicts for non-Pro users)
+  useEffect(() => {
+    if (!user || isPro) return;
+    supabase
+      .from("ai_trial_usage")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .then(({ count, error }) => {
+        if (!error) setTrialRemaining(Math.max(0, TRIAL_LIMIT - (count ?? 0)));
+      });
+  }, [user, isPro]);
+
+  // Auto-enable AI while free trial verdicts remain
+  useEffect(() => {
+    if (!isPro && user && trialRemaining !== null) setUseAI(trialRemaining > 0);
+  }, [isPro, user, trialRemaining]);
+
   const handleSubmit = useCallback(
     async (data: FormData) => {
       setIsLoading(true);
@@ -140,16 +158,37 @@ export default function Index() {
       try {
         let analysis: Result;
 
-        if (useAI && isPro) {
-          // Call AI verdict edge function
+        if (useAI && (isPro || user)) {
+          // Call AI verdict edge function (server enforces Pro / free-trial limits)
           const { data: aiResult, error } = await supabase.functions.invoke("ai-verdict", {
             body: { ...data, archetype },
           });
           if (error || aiResult?.error) {
-            toast.error(aiResult?.error || "AI analysis failed. Falling back to rule engine.");
+            // Non-2xx responses may arrive as a FunctionsHttpError; read the body for trial details
+            let errData: Record<string, unknown> | null = aiResult ?? null;
+            const ctx = (error as { context?: Response })?.context;
+            if (!errData && ctx && typeof ctx.json === "function") {
+              try {
+                errData = await ctx.json();
+              } catch {
+                errData = null;
+              }
+            }
+            if (errData?.trial_exhausted) {
+              setTrialRemaining(0);
+              setUseAI(false);
+              toast.error(
+                String(errData.error ?? "You've used your 3 free AI verdicts. Upgrade for unlimited.")
+              );
+            } else {
+              toast.error((errData?.error as string) || "AI analysis failed. Falling back to rule engine.");
+            }
             // Fallback to rule engine
             analysis = { ...analyzeSpend(data, archetype), isAI: false };
           } else {
+            if (typeof aiResult?.trial_remaining === "number") {
+              setTrialRemaining(aiResult.trial_remaining);
+            }
             analysis = { ...aiResult, isAI: true };
           }
         } else {
@@ -343,7 +382,7 @@ export default function Index() {
 
         <div className="grid gap-5 lg:grid-cols-5 lg:items-start">
         <div className="space-y-5 lg:col-span-3">
-        {/* AI toggle for Pro users */}
+        {/* AI mode: Pro toggle, or free-trial status for signed-in users */}
         {user && isPro && !result && (
           <div
             className={`flex items-center justify-between rounded-2xl border p-3.5 transition-colors ${
@@ -467,6 +506,9 @@ export default function Index() {
               linkedGoal={linkedGoal ?? null}
               emergencyFundTarget={profile?.emergency_fund_target ?? null}
               hourlyWage={profile?.hourly_wage ?? null}
+              isPro={isPro}
+              trialRemaining={trialRemaining}
+              onUpgrade={handleUpgrade}
             />
             {(result.verdict === "WAIT" || result.verdict === "SKIP") && formData && (
               <WaitPeriodSuggestion

@@ -30,6 +30,9 @@ interface VerdictDisplayProps {
   linkedGoal?: SavingsGoalWithProgress | null;
   emergencyFundTarget?: number | null;
   hourlyWage?: number | null;
+  isPro?: boolean;
+  trialRemaining?: number | null;
+  onUpgrade?: () => void;
 }
 
 const config: Record<Verdict, { icon: typeof ShieldCheck; label: string; color: string; bg: string; ring: string }> = {
@@ -63,7 +66,7 @@ const guiltyPleasures = [
   "The heart wants what the heart wants. 💛",
 ];
 
-export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal, emergencyFundTarget, hourlyWage }: VerdictDisplayProps) {
+export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, income, savings, linkedGoal, emergencyFundTarget, hourlyWage, isPro, trialRemaining, onUpgrade }: VerdictDisplayProps) {
   const [overridden, setOverridden] = useState(false);
   const c = config[verdict];
   const Icon = c.icon;
@@ -142,6 +145,13 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
             <Sparkles className="w-2.5 h-2.5" />
             AI Analysis
           </span>
+        )}
+        {isAI && !isPro && typeof trialRemaining === "number" && (
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            {trialRemaining > 0
+              ? `${trialRemaining} of 3 free AI verdicts left`
+              : "That was your last free AI verdict"}
+          </p>
         )}
       </div>
 
@@ -248,6 +258,23 @@ export function VerdictDisplay({ verdict, reason, tip, isAI, onOverride, price, 
           <p className="text-sm text-foreground/80 leading-relaxed">{tip}</p>
         </div>
       </div>
+
+      {!isPro && onUpgrade && (isAI || trialRemaining !== null) && (
+        <button
+          onClick={onUpgrade}
+          className="group flex w-full items-center justify-between gap-3 rounded-2xl bg-gradient-primary px-5 py-3.5 text-left text-primary-foreground shadow-glow transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+        >
+          <span>
+            <span className="block text-[10px] font-bold uppercase tracking-[0.16em] opacity-80">
+              Pro
+            </span>
+            <span className="block text-sm font-semibold">
+              Unlimited AI verdicts — $5/mo
+            </span>
+          </span>
+          <Sparkles className="h-5 w-5 shrink-0 transition-transform group-hover:rotate-12" />
+        </button>
+      )}
 
       {verdict !== "BUY" && (
         <AlertDialog>
