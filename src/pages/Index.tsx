@@ -30,6 +30,8 @@ import {
   clearPendingDecision,
 } from "@/lib/pendingDecision";
 
+const TRIAL_LIMIT = 3;
+
 type Verdict = "BUY" | "WAIT" | "SKIP";
 
 interface Result {
@@ -452,6 +454,23 @@ export default function Index() {
                   />
                 </div>
               </>
+            )}
+
+            {/* Free AI trial status for non-pro users */}
+            {user && !isPro && trialRemaining !== null && (
+              <div className="flex items-center gap-2.5 rounded-2xl border border-primary/25 bg-accent px-4 py-3">
+                <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+                <p className="text-xs font-medium text-foreground">
+                  {trialRemaining > 0 ? (
+                    <>
+                      Free AI trial — {trialRemaining} of {TRIAL_LIMIT} AI verdict
+                      {trialRemaining === 1 ? "" : "s"} left
+                    </>
+                  ) : (
+                    <>Free AI trial used up — upgrade for unlimited AI verdicts</>
+                  )}
+                </p>
+              </div>
             )}
 
             {/* Upgrade CTA for non-pro users */}
