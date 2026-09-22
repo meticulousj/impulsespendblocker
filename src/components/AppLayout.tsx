@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { Home, History, Target, Sparkles, User2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ExtensionHoldSync } from "@/components/ExtensionHoldSync";
 
 const tabs = [
   { to: "/", label: "Home", icon: Home, end: true },
@@ -13,6 +14,7 @@ const tabs = [
 export default function AppLayout() {
   return (
     <div className="min-h-screen flex flex-col">
+      <ExtensionHoldSync />
       <main className="flex-1 pb-32">
         <Outlet />
       </main>
