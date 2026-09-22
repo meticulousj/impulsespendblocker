@@ -12,7 +12,7 @@ interface SyncedHold {
 }
 
 export function ExtensionHoldSync() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { data: history, isLoading } = usePurchaseHistory();
   const { data: profile } = useUserProfile();
 
@@ -37,7 +37,7 @@ export function ExtensionHoldSync() {
     return JSON.stringify({ version: 1, syncedAt: Date.now(), holds });
   }, [history, profile?.archetype]);
 
-  if (!user || isLoading) return null;
+  if (authLoading || (user && isLoading)) return null;
 
   return (
     <script
