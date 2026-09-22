@@ -15,3 +15,9 @@ Automatic checks:
   popup so the verdict matches your finances. You can turn the auto pop-up off
   there too.
 - "Analyze in app" opens your dashboard with the item and price prefilled.
+
+Synced wait periods:
+- Open the signed-in Impulse Spend Blocker app after installing the extension.
+- Purchases marked WAIT sync automatically without sharing your login or financial details.
+- Return to the matching product page to see the live time remaining.
+- When the timer ends, the badge changes to "Ready to revisit" and links to your saved decision.
