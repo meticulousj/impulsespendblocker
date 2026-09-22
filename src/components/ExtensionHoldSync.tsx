@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { usePurchaseHistory } from "@/hooks/usePurchaseHistory";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useAuth } from "@/hooks/useAuth";
 import { getSuggestedPeriod } from "@/lib/waitPeriod";
 
 interface SyncedHold {
@@ -11,7 +12,8 @@ interface SyncedHold {
 }
 
 export function ExtensionHoldSync() {
-  const { data: history } = usePurchaseHistory();
+  const { user } = useAuth();
+  const { data: history, isLoading } = usePurchaseHistory();
   const { data: profile } = useUserProfile();
 
   const payload = useMemo(() => {
@@ -34,6 +36,8 @@ export function ExtensionHoldSync() {
 
     return JSON.stringify({ version: 1, syncedAt: Date.now(), holds });
   }, [history, profile?.archetype]);
+
+  if (!user || isLoading) return null;
 
   return (
     <script
