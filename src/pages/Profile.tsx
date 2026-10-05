@@ -56,8 +56,9 @@ export default function Profile() {
     }
   };
 
-  const handleDownloadExtension = () => {
-    fetch("/impulse-blocker-extension.zip")
+  const handleDownloadExtension = (browser: "chrome" | "firefox" = "chrome") => {
+    const file = browser === "firefox" ? "impulse-blocker-firefox.zip" : "impulse-blocker-extension.zip";
+    fetch(`/${file}`)
       .then((res) => {
         if (!res.ok) throw new Error(`Download failed: ${res.status}`);
         return res.blob();
@@ -65,10 +66,14 @@ export default function Profile() {
       .then((blob) => {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "impulse-blocker-extension.zip";
+        a.download = file;
         a.click();
         URL.revokeObjectURL(a.href);
-        toast.success("Extension downloaded. Unzip and load it in chrome://extensions.");
+        toast.success(
+          browser === "firefox"
+            ? "Downloaded. Unzip and load it from about:debugging in Firefox."
+            : "Extension downloaded. Unzip and load it in chrome://extensions."
+        );
       })
       .catch((err) => toast.error(err.message));
   };
@@ -225,7 +230,7 @@ export default function Profile() {
               Analyze anywhere
             </p>
             <button
-              onClick={handleDownloadExtension}
+              onClick={() => handleDownloadExtension("chrome")}
               className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
             >
               <span className="flex items-center gap-2">
@@ -234,11 +239,22 @@ export default function Profile() {
               </span>
               <span className="text-muted-foreground">.zip →</span>
             </button>
+            <button
+              onClick={() => handleDownloadExtension("firefox")}
+              className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Firefox extension
+              </span>
+              <span className="text-muted-foreground">.zip →</span>
+            </button>
             <p className="text-xs text-muted-foreground leading-relaxed">
               Pops up automatically on product, cart & checkout pages at Amazon, Shopify stores,
               eBay, Etsy, Target, Best Buy & Walmart — with price, hours of work and a
               BUY / WAIT / SKIP verdict. Set your wage and income in the extension popup.
-              Unzip → chrome://extensions → Load unpacked.
+              Chrome: unzip → chrome://extensions → Load unpacked. Firefox: unzip →
+              about:debugging → This Firefox → Load Temporary Add-on → pick manifest.json.
             </p>
             <div className="flex items-center gap-2 rounded-xl bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
               <Share2 className="w-4 h-4 text-primary shrink-0" />
