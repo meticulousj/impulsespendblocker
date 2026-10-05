@@ -12,6 +12,8 @@ interface AuthCtx {
   checkingSubscription: boolean;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  sendEmailCode: (email: string) => Promise<{ error: Error | null }>;
+  verifyEmailCode: (email: string, code: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
 }
@@ -90,11 +92,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const sendEmailCode = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
+    return { error: error as Error | null };
+  };
+
+  const verifyEmailCode = async (email: string, code: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code,
+      type: "email",
+    });
+    return { error: error as Error | null };
+  };
+
   return (
     <AuthContext.Provider value={{
       user, session, loading,
       isPro, subscriptionEnd, checkingSubscription,
-      signUp, signIn, signOut,
+      signUp, signIn, signOut, sendEmailCode, verifyEmailCode,
       refreshSubscription: checkSubscription,
     }}>
       {children}
