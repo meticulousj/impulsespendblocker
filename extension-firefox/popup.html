@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Impulse Spend Blocker</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="icon-48.png" alt="" width="28" height="28" />
+      <h1>Should I buy this?</h1>
+    </header>
+
+    <p id="detected" class="detected">Scanning page…</p>
+
+    <label for="item">Item</label>
+    <input id="item" type="text" placeholder="Product name" maxlength="120" />
+
+    <label for="price">Price ($)</label>
+    <input id="price" type="number" step="0.01" min="0.01" placeholder="0.00" />
+
+    <button id="analyze" type="button">Analyze in Impulse Blocker →</button>
+
+    <p class="hint">Opens your Impulse Spend Blocker with the item and price prefilled.</p>
+
+    <section class="settings">
+      <div class="row">
+        <label for="auto" class="inline">Auto pop-up on shopping pages</label>
+        <input id="auto" type="checkbox" class="switch" checked />
+      </div>
+      <div class="grid">
+        <div>
+          <label for="wage">Hourly wage ($)</label>
+          <input id="wage" type="number" step="0.5" min="0" placeholder="25" />
+        </div>
+        <div>
+          <label for="income">Monthly income ($)</label>
+          <input id="income" type="number" step="50" min="0" placeholder="4000" />
+        </div>
+      </div>
+      <label for="minprice">Only pop up above ($)</label>
+      <input id="minprice" type="number" step="1" min="0" placeholder="25" />
+      <p class="hint" id="saved">Saved automatically.</p>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
