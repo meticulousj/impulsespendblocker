@@ -230,7 +230,7 @@ export default function Profile() {
               Analyze anywhere
             </p>
             <button
-              onClick={handleDownloadExtension}
+              onClick={() => handleDownloadExtension("chrome")}
               className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm hover:bg-accent transition-colors"
             >
               <span className="flex items-center gap-2">
